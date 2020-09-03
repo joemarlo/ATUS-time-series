@@ -177,7 +177,7 @@ ggd1$segments$col[is.na(ggd1$segments$col)] <- 'grey50'
 # set labels for below the plot
 text_labels <- tribble(
   ~label, ~x, ~y,
-  'Cluster 1', 1800, -70,
+  'Cluster 1', 4500, -70,
   'Cluster 2', 11250, -70,
   'Cluster 3', 14250, -70,
   'Cluster 4', 19000, -70
@@ -277,3 +277,9 @@ ggsave(filename = "Plots/hamming_proportion_plots.png",
        height = 6,
        width = 9)
 
+
+# write out cluster membership --------------------------------------------
+
+atus_string_samp %>% 
+  select(ID, cluster) %>% 
+  write_csv(path = "Analyses/Hamming_clusters.csv")
