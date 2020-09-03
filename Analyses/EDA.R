@@ -1,5 +1,4 @@
 library(tidyverse)
-library(viridis)
 source("Plots/ggplot_settings.R")
 
 # read in the demographics data

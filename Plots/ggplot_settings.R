@@ -1,3 +1,4 @@
+library(viridis)
 
 # build custom theme
 theme_custom <- function() {
