@@ -45,7 +45,6 @@ demographics_df %>%
        y = "Mean minutes per day")
 
 
-
 # glmer -------------------------------------------------------------------
 
 # plot a poisson fit on year means
@@ -72,54 +71,4 @@ summary(glm_model)
 # fit a negative binomial model
 nb_model <- MASS::glm.nb(TRTALONE ~ year + weekday, data = demographics_df %>% mutate(weekday = day_of_week %in% 2:6))
 summary(nb_model)
-
-
-# Add a Poisson trend line for each cluster
-# ggplot(aes(x = Year, y = TotalIncidents, group = Cluster)) +
-#   geom_line() +
-#   geom_smooth(method = 'glm', 
-#               method.args = c("poisson"), 
-#               se = FALSE)
-# 
-# glm(Time spent alone ~ Year + Cluster + weekday, data = hate, family = "poisson")
-
-# Cluster as random-effect intercept and Year as both fixed and random effect slope
-# need to scale Year first
-# Year_scaled <- Year - min(Year)
-# lmer4::glmer(Time spent alone ~ Year + weekday + (Year | Cluster), data = hate, family = "poisson")
-
-# what other variables? Age?
-
-
-
-# displaying results of model ---------------------------------------------
-
-# glmer_out is the model
-
-# # Extract out the fixed-effect slope for Year2
-# Year2_slope <- fixef(glmer_out)['Year2']
-# 
-# # Extract out the random-effect slopes for county
-# county_slope <- ranef(glmer_out)$County
-# 
-# # Create a new column for the slope
-# county_slope$slope <- county_slope$Year2 + Year2_slope
-# 
-# # Use the row names to create a county name column
-# county_slope$county <- rownames(county_slope)
-# 
-# # Create an ordered county-level factor based upon slope values
-# county_slope$county_plot <- factor(county_slope$county, 
-#                                    levels = county_slope$county[order(county_slope$slope)])
-# 
-# # Now plot the results using ggplot2
-# ggplot(data = county_slope, aes(x = county_plot, y = slope)) + 
-#   geom_point() +
-#   coord_flip() + 
-#   theme_bw() + 
-#   ylab("Change in hate crimes per year")  +
-#   xlab("County")
-
-
-
 

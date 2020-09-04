@@ -1,5 +1,5 @@
-library(tidyverse)
 library(MASS)
+library(tidyverse)
 library(lme4)
 source("Plots/ggplot_settings.R")
 options(mc.cores = parallel::detectCores())
@@ -59,9 +59,10 @@ final_df %>%
   mutate(cluster = if_else(cluster == 1, "Cluster 1", as.character(cluster)),
          cluster = factor(cluster, levels = c("Cluster 1", as.character(2:n_clusters)))) %>% 
   ggplot(aes(x = year, y = alone_minutes, color = cluster, group = cluster)) +
-  geom_jitter(alpha = 0.01) +
+  geom_jitter(alpha = 0.03) +
   geom_smooth(method = 'glm.nb') +
   scale_y_continuous(labels = scales::comma_format()) +
+  coord_cartesian(ylim = c(200, 450)) +
   labs(title = "Negative binomial models show differing patterns across clusters",
        subtitle = paste0("Sample of ", 
                          scales::comma_format()(nrow(final_df)),
@@ -131,7 +132,7 @@ cluster_slope %>%
        caption = "Data from American Time Use Survey 2003-2018",
        x = "Cluster membership",
        y = "Yearly change in daily minutes spent alone")
-ggsave(filename = "Plots/hamming_poisson_effects.png",
-       device = "png",
+ggsave(filename = "Plots/hamming_poisson_effects.svg",
+       device = "svg",
        height = 5,
        width = 7)
