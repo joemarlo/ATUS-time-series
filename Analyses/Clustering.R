@@ -34,6 +34,7 @@ IDs <- demographics %>%
 atus_filtered <- atus[atus$ID %in% IDs,]
 rm(atus, IDs)
 
+
 # string conversion -------------------------------------------------------
 
 # create table that matches description to letter
@@ -58,6 +59,7 @@ atus_string <- atus_filtered %>%
 n_sample <- 10000
 weights <- demographics %>% right_join(atus_string, by = "ID") %>% pull(survey_weight)
 atus_string_samp <- sample_n(atus_string, size = n_sample, weight = weights, replace = TRUE)
+# change to replace = FALSE b/c of singularities?
 
 
 # distance ----------------------------------------------------------------

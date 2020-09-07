@@ -7,7 +7,7 @@ set.seed(44)
 options(scipen = 999)
 
 select <- function(...){
-  # MASS also has a select so this ensure dplr select is used
+  # MASS also has a select() function so this prioritizes dplyr's select()
   dplyr::select(...)
 }
 
@@ -55,23 +55,23 @@ final_df %>%
        y = "n")
 
 # plot the mean alone time per cluster and method
-final_df %>%
-  pivot_longer(cols = contains('cluster'),
-               names_to = "method", values_to = "cluster") %>% 
-  group_by(method, year, cluster) %>% 
-  summarize(mean_alone_time = mean(alone_minutes),
-            .groups = 'drop') %>% 
-  ggplot(aes(x = year, y = mean_alone_time, color = cluster, group = cluster)) +
-  geom_line() +
-  geom_smooth() +
-  facet_wrap(~method) +
-  labs(title = "Data shows differing patterns in mean time spent alone across clusters",
-       subtitle = paste0("Sample of ", 
-                       scales::comma_format()(nrow(final_df)),
-                       " respondents"),
-     caption = "American Time Use Survey 2003-2018",
-     x = "Year",
-     y = "Mean minutes per day")
+# final_df %>%
+#   pivot_longer(cols = contains('cluster'),
+#                names_to = "method", values_to = "cluster") %>% 
+#   group_by(method, year, cluster) %>% 
+#   summarize(mean_alone_time = mean(alone_minutes),
+#             .groups = 'drop') %>% 
+#   ggplot(aes(x = year, y = mean_alone_time, color = cluster, group = cluster)) +
+#   geom_line(alpha = 0.5) +
+#   geom_smooth() +
+#   facet_wrap(~method) +
+#   labs(title = "Data shows differing patterns in mean time spent alone across clusters",
+#        subtitle = paste0("Sample of ", 
+#                        scales::comma_format()(nrow(final_df)),
+#                        " respondents"),
+#      caption = "American Time Use Survey 2003-2018",
+#      x = "Year",
+#      y = "Mean minutes per day")
 
 # plot a negative binomial model on respondent level data
 final_df %>% 
@@ -123,7 +123,13 @@ method_df %>%
   ggplot(aes(x = alone_minutes)) +
   geom_histogram(binwidth = 1)
 # jitter the data to overcome singularities?
-# method_df$alone_minutes <- max(0, jitter(method_df$alone_minutes))
+# method_df$alone_minutes <- pmax(0, jitter(method_df$alone_minutes))
+
+# or is there a problem because its zero-inflated ?
+mean(method_df$alone_minutes == 0)
+zip_model <- pscl::zeroinfl(formula = alone_minutes ~ year + cluster | age,
+                      data = method_df)
+summary(zip_model)
 
 # fit poisson and negative binomial
 summary(glm(alone_minutes ~ year + cluster, data = method_df, family = "poisson"))
@@ -140,6 +146,9 @@ anova(mlm_poisson)
 mlm_nb <- lme4::glmer.nb(alone_minutes ~ year + (year | cluster), data = method_df, verbose = TRUE)
 summary(mlm_nb)
 anova(mlm_nb)
+getME(mlm_nb, 'theta')
+getME(mlm_nb, 'lower')
+#https://rstudio-pubs-static.s3.amazonaws.com/33653_57fc7b8e5d484c909b615d8633c01d51.html
 
 mlm_linear <- lme4::lmer(alone_minutes ~ year + (year | cluster), data = method_df)
 summary(mlm_linear)
