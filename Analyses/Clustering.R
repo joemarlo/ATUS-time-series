@@ -63,13 +63,18 @@ atus_string_samp <- sample_n(atus_string, size = n_sample, weight = weights, rep
 # distance ----------------------------------------------------------------
 
 # compute the string distances
-# dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = "osa")
-dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = "hamming")
-# dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = "lcs")
+distance_method <- "lv" # "lv" "hamming" "osa" "lcs"
+distance_method_pretty <- case_when(distance_method == 'hamming' ~ "Hamming",
+                                    distance_method == 'osa' ~ "OSA",
+                                    distance_method == 'lcs' ~ 'LCS',
+                                    distance_method == 'lv' ~ 'Levenshtein')
+dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = distance_method)
 
 # there may be infinite distances between two strings so need to top top code them
 hist(dist_matrix)
-dist_matrix[is.infinite(dist_matrix)] <- 10000
+range(dist_matrix)
+any(is.infinite(dist_matrix))
+dist_matrix[is.infinite(dist_matrix)] <- 100000
 
 
 # optimal clusters --------------------------------------------------------
@@ -80,7 +85,7 @@ hclust_sw <- NbClust(
   diss = dist_matrix,
   distance = NULL,
   method = 'ward.D2',
-  max.nc = 10,
+  max.nc = 20,
   min.nc = 2,
   index = 'silhouette'
 )
@@ -92,13 +97,15 @@ hclust_sw$All.index %>%
   ggplot(aes(x = name, y = value)) +
   geom_line(color = 'grey30') +
   geom_area(alpha = 0.4) +
-  labs(title = "Hamming edit distance: silhouette of various n cluster sizes",
+  geom_point(color = 'grey30') +
+  scale_x_continuous(breaks = 2:20) +
+  labs(title = paste0(distance_method_pretty, " edit distance silhouette width"),
        subtitle = paste0("Weighted sample of ", 
                          scales::comma_format()(n_sample),
                          " respondents"),
        x = 'n clusters',
        y = 'Silhouette width')
-ggsave(filename = "Plots/hamming_silhouette.svg",
+ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_silhouette.svg"),
        device = "svg",
        height = 5,
        width = 7)
@@ -115,19 +122,23 @@ n_sample <- 25000
 atus_string_samp <- sample_n(atus_string, size = n_sample, weight = weights, replace = TRUE)
 
 # compute the string distances
-# dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = "osa")
-dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = "hamming")
-# dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = "lcs")
+dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = distance_method)
+
+# there may be infinite distances between two strings so need to top top code them
+# hist(dist_matrix)
+range(dist_matrix)
+any(is.infinite(dist_matrix))
+dist_matrix[is.infinite(dist_matrix)] <- 100000
 
 # ward (D2) linkage hier clustering
 hcl_ward <- hclust(d = dist_matrix, method = 'ward.D2')
-plot(hcl_ward)
+# plot(hcl_ward)
 
 
 # color the dendrogram and get the cluster membership ---------------------
 
 # trimmed, colored branches tree
-hcl_k <- 4
+hcl_k <- hclust_sw$Best.nc[['Number_clusters']]
 dend <- as.dendrogram(hcl_ward) %>% set("branches_k_color", k = hcl_k) %>% set("labels_colors")
 dend <- cut(dend, h = 50)$upper # cut off bottom of dendogram for computation performance
 ggd1 <- as.ggdend(dend)
@@ -140,8 +151,8 @@ groupings <- cutree(hcl_ward, hcl_k)
 label_match <- ggd1$segments %>% 
   filter(col != '<NA>') %>% 
   group_by(col) %>% 
-  filter(xend <= quantile(xend, 0.99),
-         xend >= quantile(xend, 0.01)) %>% 
+  # filter(xend <= quantile(xend, 0.99),
+  #        xend >= quantile(xend, 0.01)) %>% 
   summarize(x_min = min(xend),
             x_max = max(xend),
             .groups = 'drop') %>% 
@@ -175,12 +186,20 @@ ggd1$segments$linetype[which(is.na(ggd1$segments$col))] <- 'dashed'
 ggd1$segments$col[is.na(ggd1$segments$col)] <- 'grey50'
 
 # set labels for below the plot
+# hamming + OSA
 text_labels <- tribble(
   ~label, ~x, ~y,
   'Cluster 1', 4500, -70,
   'Cluster 2', 11250, -70,
   'Cluster 3', 14250, -70,
   'Cluster 4', 19000, -70
+)
+# LCS
+text_labels <- tribble(
+  ~label, ~x, ~y,
+  'Cluster 1', 4500, -90,
+  'Cluster 2', 13250, -90,
+  'Cluster 3', 19000, -90
 )
 
 # plot the dendrogram
@@ -189,9 +208,12 @@ ggplot(ggd1$segments) +
                linetype = ggd1$segments$linetype, lwd = 0.6, alpha = 0.7) +
   geom_text(data = text_labels, aes(label = label, x = x, y = y), family = 'Helvetica') +
   coord_cartesian(ylim = c(100, 2500), clip = 'off') +
+  # coord_cartesian(ylim = c(100, 4500), clip = 'off') +
   scale_x_continuous(labels = NULL) +
   scale_y_continuous(labels = NULL) +
-  labs(title = 'Hamming edit distance: 4 cluster solution with Ward (D2) linkage',
+  labs(title = paste0(distance_method_pretty, 
+                      ' edit distance: ', hcl_k, 
+                      ' cluster solution with Ward (D2) linkage'),
        subtitle = paste0("Weighted sample of ", 
                          scales::comma_format()(n_sample),
                          " respondents"),
@@ -201,7 +223,7 @@ ggplot(ggd1$segments) +
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.position = 'none')
-ggsave(filename = "Plots/hamming_dendrogram.svg",
+ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_dendrogram.svg"),
        device = "svg",
        height = 5,
        width = 7)
@@ -242,11 +264,12 @@ atus_samp %>%
                      breaks = seq(0, 48, by = 4)) +
   facet_wrap(~cluster, ncol = 2, scales = 'free_y') +
   labs(title = "Sequence plots of each individual's day by cluster",
-       subtitle = "Based on Hamming edit distance and Ward D2 clustering\nEach row represents an individual person's day, sorted by Shannon entropy",
+       subtitle = paste0("Based on ", distance_method_pretty, 
+                         " edit distance and Ward D2 clustering\nEach row represents an individual person's day, sorted by Shannon entropy"),
        x = "Time of day", 
        y = "Individuals") +
   theme(legend.position = 'right')
-ggsave(filename = "Plots/hamming_sequence_plots.png",
+ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_sequence_plots.png"),
        device = "png",
        height = 6,
        width = 9)
@@ -266,13 +289,14 @@ atus_samp %>%
   scale_y_continuous(labels = NULL) +
   facet_wrap(~cluster, ncol = 2) +
   labs(title = "Observed proportion of activities by cluster",
-       subtitle = "Based on Hamming edit distance and Ward D2 clustering\n",
+       subtitle = paste0("Based on ", distance_method_pretty, 
+                         " edit distance and Ward D2 clustering\n"),
        x = "Time of day",
        y = "Proportion") +
   theme(legend.position = 'right',
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_blank())
-ggsave(filename = "Plots/hamming_proportion_plots.png",
+ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_proportion_plots.png"),
        device = "png",
        height = 6,
        width = 9)
@@ -282,4 +306,6 @@ ggsave(filename = "Plots/hamming_proportion_plots.png",
 
 atus_string_samp %>% 
   select(ID, cluster) %>% 
-  write_csv(path = "Analyses/Hamming_clusters.csv")
+  rename_with(function(x) paste0(distance_method, "_cluster"), .cols = cluster) %>% 
+  write_csv(path = paste0("Analyses/", distance_method_pretty, "/", distance_method_pretty, "_clusters.csv"))
+
