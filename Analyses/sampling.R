@@ -1,7 +1,5 @@
 library(tidyverse)
-options(mc.cores = parallel::detectCores())
 set.seed(44)
-options(scipen = 999)
 
 # read in activities
 atus <- read_delim(file = "Inputs/atus.tsv", 
