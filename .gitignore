@@ -3,6 +3,6 @@
 .RData
 .Ruserdata
 
-Data/*.tsv
+Inputs/*.tsv
 .DS_Store
 .DS_store

@@ -7,59 +7,15 @@ options(mc.cores = parallel::detectCores())
 set.seed(44)
 options(scipen = 999)
 
-# read in activities
-atus <- read_delim(file = "Data/atus.tsv", 
-                   delim = "\t", 
-                   escape_double = FALSE, 
-                   col_types = cols(ID = col_double(), 
-                                    period = col_number()), 
-                   trim_ws = TRUE)
 
-# read in the demographics data
-demographics <- read_delim(file = "Data/demographic.tsv",
-                           delim = "\t",
-                           escape_double = FALSE,
-                           trim_ws = TRUE)
+# read in the sample ------------------------------------------------------
 
-
-# filtering ---------------------------------------------------------------
-
-# filter to only include respondents who logged on weekdays and non holidays
-IDs <- demographics %>% 
-  filter(day_of_week %in% 2:6,
-         holiday == 0) %>% 
-  pull(ID)
-
-# filter the atus df to include only these respondents
-atus_filtered <- atus[atus$ID %in% IDs,]
-rm(atus, IDs)
-
-
-# string conversion -------------------------------------------------------
-
-# create table that matches description to letter
-string_table <- distinct(atus_filtered, description) %>% 
-  mutate(string = LETTERS[1:(nrow(.))])
-
-# turn each ID's periods into a single string representing the 48 30 minute
-  # periods of their day
-atus_string <- atus_filtered %>% 
-  left_join(string_table, by = 'description') %>% 
-  group_by(ID) %>% 
-  summarize(string = paste0(string, collapse = ""),
-            .groups = 'drop')
-
-
-# sampling ----------------------------------------------------------------
-
-# data needs to be sampled b/c 200k respondents creates too large a distance
-  # matrix for 48gb of memory
-
-# sample nrows from the dataset using the survey weights
-n_sample <- 10000
-weights <- demographics %>% right_join(atus_string, by = "ID") %>% pull(survey_weight)
-atus_string_samp <- sample_n(atus_string, size = n_sample, weight = weights, replace = TRUE)
-# change to replace = FALSE b/c of singularities?
+atus_string_samp <- read_csv("Analyses/Data/sample_10k.csv",
+                             col_types = cols(
+                               ID = col_double(),
+                               string = col_character()
+                             ))
+n_sample <- nrow(atus_string_samp)
 
 
 # distance ----------------------------------------------------------------
@@ -77,6 +33,11 @@ hist(dist_matrix)
 range(dist_matrix)
 any(is.infinite(dist_matrix))
 dist_matrix[is.infinite(dist_matrix)] <- 100000
+
+
+# DBSCAN ------------------------------------------------------------------
+
+db_cluster <- dbscan::dbscan(x = dist_matrix, eps = 10, minPts = 100)
 
 
 # optimal clusters --------------------------------------------------------
@@ -120,8 +81,13 @@ ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distanc
   # recompute the distance matrix and clustering
 
 # increase sample size
-n_sample <- 25000
-atus_string_samp <- sample_n(atus_string, size = n_sample, weight = weights, replace = TRUE)
+atus_string_samp <- read_csv("Analyses/Data/sample_25k.csv",
+                             col_types = cols(
+                               ID = col_double(),
+                               string = col_character()
+                             ))
+n_sample <- nrow(atus_string_samp)
+
 
 # compute the string distances
 dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = distance_method)
@@ -235,6 +201,13 @@ ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distanc
 
 # add cluster membership to df
 atus_string_samp$cluster <- correct_clusters
+
+# get the string to activity descriptions mapping
+string_table <- read_csv("Analyses/Data/string_table.csv",
+                         col_types = cols(
+                           description = col_character(),
+                           string = col_character()
+                         ))
 
 # convert df back to long with a row per activity
 atus_samp <- atus_string_samp %>%

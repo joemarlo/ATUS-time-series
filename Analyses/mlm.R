@@ -12,7 +12,7 @@ select <- function(...){
 }
 
 # read in the demographics data
-demographics <- read_delim(file = "Data/demographic.tsv",
+demographics <- read_delim(file = "Inputs/demographic.tsv",
                            delim = "\t",
                            escape_double = FALSE,
                            trim_ws = TRUE)
@@ -126,10 +126,11 @@ method_df %>%
 # method_df$alone_minutes <- pmax(0, jitter(method_df$alone_minutes))
 
 # or is there a problem because its zero-inflated ?
-mean(method_df$alone_minutes == 0)
-zip_model <- pscl::zeroinfl(formula = alone_minutes ~ year + cluster | age,
-                      data = method_df)
-summary(zip_model)
+# hist(method_df$alone_minutes)
+# mean(method_df$alone_minutes == 0)
+# zip_model <- pscl::zeroinfl(formula = alone_minutes ~ year + cluster | age,
+#                       data = method_df)
+# summary(zip_model)
 
 # fit poisson and negative binomial
 summary(glm(alone_minutes ~ year + cluster, data = method_df, family = "poisson"))
@@ -148,6 +149,10 @@ summary(mlm_nb)
 anova(mlm_nb)
 getME(mlm_nb, 'theta')
 getME(mlm_nb, 'lower')
+
+# restart
+ss <- getME(mlm_nb, c("theta","fixef"))
+m2 <- update(mlm_nb, start = ss, control = glmerControl(optimizer="bobyqa", optCtrl = list(maxfun = 2e8)))
 #https://rstudio-pubs-static.s3.amazonaws.com/33653_57fc7b8e5d484c909b615d8633c01d51.html
 
 mlm_linear <- lme4::lmer(alone_minutes ~ year + (year | cluster), data = method_df)
