@@ -12,3 +12,18 @@ See also: [ATUS repo](https://github.com/joemarlo/ATUS)
 <p align="center">
 <img src="Plots/mean_alone_time.svg" width=79%>
 </p>
+
+<br>
+<p align="center">
+<img src="Analyses/OSA/OSA_dendrogram.svg" width=79%>
+</p>
+
+<br>
+<p align="center">
+<img src="Analyses/OSA/OSA_silhouette.svg" width=79%>
+</p>
+
+<br>
+<p align="center">
+<img src="Analyses/OSA/OSA_proportion_plots.png" width=79%>
+</p>
