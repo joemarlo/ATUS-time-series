@@ -95,6 +95,39 @@ ggsave(filename = "Plots/negative_binomial.png",
        height = 7,
        width = 7)
 
+# fit those negative binomials individually and examine the coeficients
+nb_models <- final_df %>% 
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>% 
+  group_by(method, cluster) %>% 
+  nest() %>% 
+  mutate(model = map(data, function(df) MASS::glm.nb(alone_minutes ~ year, data = df)),
+         tidied = map(model, broom::tidy)) %>% 
+  unnest(tidied) %>% 
+  select(-model, -data) %>% 
+  ungroup()
+
+# plot the estimate and std err per each model
+nb_models %>% 
+  filter(term == 'year') %>% 
+  mutate(method = sub(pattern = "*_.*", "", method),
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster)),
+         group = paste0(method, "-", cluster)) %>% 
+  select(group, cluster, estimate, std.error) %>% 
+  pivot_longer(cols = -c('group', 'cluster')) %>% 
+  ggplot(aes(x = value, y = reorder(group, cluster), color = as.factor(cluster))) +
+  geom_point() +
+  facet_wrap(~name, scales = 'free_x') +
+  labs(title = "Negative binomial estimates for `year`",
+       subtitle = "Models fitted individually by edit distance method and cluster membership",
+       x = NULL,
+       y = "[method]-[cluster]") +
+  theme(legend.position = 'none')
+ggsave(filename = "Plots/negative_binomial_estimates.png",
+       device = "png",
+       height = 5,
+       width = 7)
+
 
 # fit the mlms ------------------------------------------------------------
 

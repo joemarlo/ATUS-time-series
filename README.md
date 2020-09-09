@@ -27,3 +27,8 @@ See also: [ATUS repo](https://github.com/joemarlo/ATUS)
 <p align="center">
 <img src="Analyses/OSA/Plots/OSA_proportion_plots.png" width=79%>
 </p>
+
+<br>
+<p align="center">
+<img src="Plots/negative_binomial_estimates.png" width=79%>
+</p>
