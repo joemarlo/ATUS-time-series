@@ -120,7 +120,7 @@ nb_models %>%
   facet_wrap(~name, scales = 'free_x') +
   labs(title = "Negative binomial estimates for `year`",
        subtitle = "Models fitted individually by edit distance method and cluster membership",
-       x = NULL,
+       x = "Value {difference in log(daily minutes alone)}",
        y = "[method]-[cluster]") +
   theme(legend.position = 'none')
 ggsave(filename = "Plots/negative_binomial_estimates.png",
@@ -128,6 +128,8 @@ ggsave(filename = "Plots/negative_binomial_estimates.png",
        height = 5,
        width = 7)
 
+# these coefficients are interpreted as roughly a range of +1min to -3min per year depending on the cluster
+# e.g. log(300) - log(299) = 0.003
 
 # fit the mlms ------------------------------------------------------------
 
