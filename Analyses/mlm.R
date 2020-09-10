@@ -172,6 +172,57 @@ clusters_df %>%
   facet_grid(description ~ method, scales = 'free_y')
 
 
+# check the agreement among the clustering methods ------------------------
+
+# percent of respondents that have full cluster agreement
+clusters_df %>%
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>%
+  mutate(method = sub(pattern = "*_.*", "", method)) %>%
+  left_join(cluster_descriptions) %>%
+  group_by(ID) %>%
+  summarize(n_memberships = length(table(description))) %>%
+  ggplot(aes(x = n_memberships)) +
+  geom_bar(aes(y = ..count.. / sum(..count..))) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1.0),
+                     breaks = seq(0, 1, by = 0.1)) +
+  labs(title = "Percent of respondents who have X cluster memberships",
+       subtitle = "1 = total agreement across the clustering methods",
+       x = "Number of cluster memberships per respondent",
+       y = "Percent of respondents")
+ggsave(filename = "Plots/cluster_agreement.png",
+       device = "png",
+       height = 5,
+       width = 7)
+  
+# overlap of cluster membership
+clusters_df %>% 
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>% 
+  mutate(method = sub(pattern = "*_.*", "", method)) %>% 
+  left_join(cluster_descriptions) %>%
+  arrange(ID, method, description) %>% 
+  group_by(ID) %>% 
+  mutate(entropy = DescTools::Entropy(table(description)),
+         # first = first(description),
+         most_common = names(sort(table(description)))[[1]]) %>% 
+  ungroup() %>% 
+  arrange(most_common, entropy) %>% 
+  mutate(order = row_number()) %>% 
+  ggplot(aes(x = method, y = reorder(as.factor(ID), order), fill = description)) +
+  geom_tile() +
+  scale_y_discrete(labels = NULL) +
+  labs(title = "Cluster agreement across methods",
+       subtitle = "Each row represents a respondent\nThe color represents the cluster they were assigned to under that clustering method",
+       x = 'Clustering method',
+       y = 'Respondents')
+ggsave(filename = "Plots/cluster_overlap.png",
+       device = "png",
+       height = 8,
+       width = 7,
+       dpi = 600)
+
+
 # fit the mlms ------------------------------------------------------------
 
 # split the data by cluster into individual dataframes
