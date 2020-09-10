@@ -28,8 +28,9 @@ osa_clusters <- read_csv(file = "Analyses/OSA/OSA_clusters.csv",
                              col_types = cols(osa_cluster = col_integer()))
 
 # join all the clusters dfs together and remove duplicates (due to weighted sampling)
-clusters_df <- Reduce(x = list(hamming_clusters, lcs_clusters, levenshtein_clusters, osa_clusters),
-       f = function(x, y) left_join(x, y, by = 'ID')
+clusters_df <- Reduce(
+  x = list(hamming_clusters, lcs_clusters, levenshtein_clusters, osa_clusters),
+  f = function(x, y) left_join(x, y, by = 'ID')
 )
 rm(hamming_clusters, lcs_clusters, levenshtein_clusters, osa_clusters)
 
@@ -152,7 +153,24 @@ ggsave(filename = "Plots/negative_binomial_estimates.png",
        width = 7)
 
 # these coefficients are interpreted as roughly a range of +1min to -3min per year depending on the cluster
-# e.g. log(300) - log(299) = 0.003
+# e.g. log(300) - log(299) = 0.003 which equals to exp(0.003) - 1 = 0.003004505 or 0.3% increase annually
+
+clusters_df %>% 
+  left_join(demographics, by = "ID") %>% 
+  select(ID, contains("cluster"), age, sex, state, race, alone_minutes = TRTALONE, year, student = TESCHFT) %>% 
+  mutate(student = recode(student,
+                            '-1' = "No",
+                            '1' = 'Full time',
+                            '2' = 'Part time')) %>% 
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>% 
+  mutate(method = sub(pattern = "*_.*", "", method)) %>% 
+  left_join(cluster_descriptions) %>% 
+  filter(alone_minutes != -1) %>% 
+  ggplot(aes(x = alone_minutes)) +
+  geom_density() +
+  facet_grid(description ~ method, scales = 'free_y')
+
 
 # fit the mlms ------------------------------------------------------------
 

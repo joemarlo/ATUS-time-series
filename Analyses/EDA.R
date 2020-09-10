@@ -2,7 +2,7 @@ library(tidyverse)
 source("Plots/ggplot_settings.R")
 
 # read in the demographics data
-demographics_df <- read_delim(file = "Data/demographic.tsv",
+demographics_df <- read_delim(file = "Inputs/demographic.tsv",
                               delim = "\t",
                               escape_double = FALSE,
                               trim_ws = TRUE)
@@ -43,6 +43,35 @@ demographics_df %>%
        caption = "American Time Use Survey 2003-2018",
        x = "Year",
        y = "Mean minutes per day")
+
+
+# alone time by state -----------------------------------------------------
+
+demographics_df %>% 
+  group_by(state) %>% 
+  summarize("Alone time excluding work" = sum(survey_weight * TRTALONE) / sum(survey_weight),
+            # "All alone time" = sum(survey_weight * TRTALONE_WK) / sum(survey_weight),
+            .groups = 'drop') %>% 
+  na.omit() %>% 
+  fuzzyjoin::stringdist_left_join(map_data("state"), by = c(state = 'region')) %>% 
+  ggplot() +
+  geom_polygon(aes(x = long, y = lat, group = group, fill = `Alone time excluding work`), color = 'white') +
+  coord_map(projection = "albers", lat0 = 38, lat1 = 45,
+            xlim = c(-120, -75)) +
+  scale_fill_gradient(low = '#b5e6ce', high = '#030f09',
+                      name = 'Minutes') +
+  labs(title = 'Mean daily alone time',
+       subtitle = 'Excludes alone time associated with working or sleeping',
+       caption = '2003-2018 American Time Use Survey') +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        legend.title = element_text(hjust = 0),
+        legend.position = 'right')
+ggsave(filename = "Plots/alone_time_by_state.png",
+       device = "png",
+       height = 7,
+       width = 9)
 
 
 # glmer -------------------------------------------------------------------
