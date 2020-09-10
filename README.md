@@ -15,17 +15,17 @@ See also: [ATUS repo](https://github.com/joemarlo/ATUS)
 
 <br>
 <p align="center">
-<img src="Analyses/OSA/Plots/OSA_dendrogram.svg" width=79%>
+<img src="Analyses/Levenshtein/Plots/Levenshtein_dendrogram.svg" width=79%>
 </p>
 
 <br>
 <p align="center">
-<img src="Analyses/OSA/Plots/OSA_silhouette.svg" width=79%>
+<img src="Analyses/Levenshtein/Plots/Levenshtein_silhouette.svg" width=79%>
 </p>
 
 <br>
 <p align="center">
-<img src="Analyses/OSA/Plots/OSA_proportion_plots.png" width=79%>
+<img src="Analyses/Levenshtein/Plots/Levenshtein_proportion_plots.png" width=79%>
 </p>
 
 <br>

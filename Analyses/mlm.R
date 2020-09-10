@@ -29,8 +29,9 @@ osa_clusters <- read_csv(file = "Analyses/OSA/OSA_clusters.csv",
 
 # join all the clusters dfs together and remove duplicates (due to weighted sampling)
 clusters_df <- Reduce(x = list(hamming_clusters, lcs_clusters, levenshtein_clusters, osa_clusters),
-       f = function(x, y) left_join(distinct(x), distinct(y), by = 'ID')
+       f = function(x, y) left_join(x, y, by = 'ID')
 )
+rm(hamming_clusters, lcs_clusters, levenshtein_clusters, osa_clusters)
 
 # create dataframe of variables of interest; factorized the cluster variables
 final_df <- clusters_df %>% 
@@ -84,7 +85,7 @@ final_df %>%
   scale_y_continuous(labels = scales::comma_format()) +
   coord_cartesian(ylim = c(200, 450)) +
   labs(title = "Negative binomial models show differing patterns across clusters",
-       subtitle = paste0("Sample of ", 
+       subtitle = paste0("Weighted sample of ", 
                          scales::comma_format()(nrow(final_df)),
                          " respondents"),
        caption = "American Time Use Survey 2003-2018",
@@ -95,7 +96,7 @@ ggsave(filename = "Plots/negative_binomial.png",
        height = 7,
        width = 7)
 
-# fit those negative binomials individually and examine the coeficients
+# fit the previously plotted negative binomial models individually and examine the coeficients
 nb_models <- final_df %>% 
   pivot_longer(cols = contains('cluster'),
                names_to = "method", values_to = "cluster") %>% 
@@ -107,25 +108,47 @@ nb_models <- final_df %>%
   select(-model, -data) %>% 
   ungroup()
 
+# cluster descriptions based on proportion plots
+cluster_descriptions <- tribble(~method, ~cluster, ~description,
+        'hamming', 1, '9-5 workers',
+        'hamming', 2, 'Late night workers',
+        'hamming', 3, 'Students',
+        'hamming', 4, 'Uncategorized',
+        'lcs', 1, '9-5 workers',
+        'lcs', 2, 'Students',
+        'lcs', 3, 'Uncategorized',
+        'lv', 1, '9-5 workers',
+        'lv', 2, 'Late night workers',
+        'lv', 3, 'Students',
+        'lv', 4, 'Uncategorized',
+        'osa', 1, 'Students',
+        'osa', 2, 'Uncategorized',
+        'osa', 3, '9-5 workers',
+        'osa', 4, 'Late night workers')
+        
+
 # plot the estimate and std err per each model
 nb_models %>% 
   filter(term == 'year') %>% 
   mutate(method = sub(pattern = "*_.*", "", method),
-         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster)),
-         group = paste0(method, "-", cluster)) %>% 
-  select(group, cluster, estimate, std.error) %>% 
-  pivot_longer(cols = -c('group', 'cluster')) %>% 
-  ggplot(aes(x = value, y = reorder(group, cluster), color = as.factor(cluster))) +
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+  # group = paste0(method, "-", cluster)) %>%
+  left_join(cluster_descriptions) %>% 
+  mutate(description = factor(description, 
+                              levels = c('9-5 workers', 'Late night workers', 'Students', 'Uncategorized'))) %>% 
+  select(method, description, estimate, std.error) %>% 
+  pivot_longer(cols = -c('method', 'description')) %>% 
+  ggplot(aes(x = value, y = method, color = description)) +
   geom_point() +
-  facet_wrap(~name, scales = 'free_x') +
+  facet_grid(description~name, scales = 'free_x') +
   labs(title = "Negative binomial estimates for `year`",
        subtitle = "Models fitted individually by edit distance method and cluster membership",
-       x = "Value {difference in log(daily minutes alone)}",
-       y = "[method]-[cluster]") +
+       x = "\nValue {difference in log(daily minutes alone)}",
+       y = NULL) +
   theme(legend.position = 'none')
 ggsave(filename = "Plots/negative_binomial_estimates.png",
        device = "png",
-       height = 5,
+       height = 8,
        width = 7)
 
 # these coefficients are interpreted as roughly a range of +1min to -3min per year depending on the cluster
