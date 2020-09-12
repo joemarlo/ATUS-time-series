@@ -15,13 +15,15 @@ atus_string_samp <- read_csv("Analyses/Data/sample_10k.csv",
                                ID = col_double(),
                                string = col_character()
                              ))
+
+# set sample size
 n_sample <- nrow(atus_string_samp)
 
 
 # distance ----------------------------------------------------------------
 
 # compute the string distances
-distance_method <- "lcs" # "lv" "hamming" "osa" "lcs"
+distance_method <- "lv" # "lv" "hamming" "osa" "lcs"
 distance_method_pretty <- case_when(distance_method == 'hamming' ~ "Hamming",
                                     distance_method == 'osa' ~ "OSA",
                                     distance_method == 'lcs' ~ 'LCS',
@@ -86,8 +88,9 @@ atus_string_samp <- read_csv("Analyses/Data/sample_25k.csv",
                                ID = col_double(),
                                string = col_character()
                              ))
-n_sample <- nrow(atus_string_samp)
 
+# set sample size
+n_sample <- nrow(atus_string_samp)
 
 # compute the string distances
 dist_matrix <- stringdistmatrix(a = atus_string_samp$string, method = distance_method)

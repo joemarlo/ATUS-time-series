@@ -10,7 +10,7 @@ See also: [ATUS repo](https://github.com/joemarlo/ATUS)
 <br>
 <br>
 <p align="center">
-<img src="Plots/mean_alone_time.svg" width=79%>
+<img src="Plots/mean_alone_time.png" width=79%>
 </p>
 
 <br>

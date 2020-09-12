@@ -112,20 +112,20 @@ nb_models <- final_df %>%
 # cluster descriptions based on proportion plots
 cluster_descriptions <- tribble(~method, ~cluster, ~description,
         'hamming', 1, '9-5 workers',
-        'hamming', 2, 'Late night workers',
+        'hamming', 2, 'Night workers',
         'hamming', 3, 'Students',
         'hamming', 4, 'Uncategorized',
         'lcs', 1, '9-5 workers',
         'lcs', 2, 'Students',
         'lcs', 3, 'Uncategorized',
         'lv', 1, '9-5 workers',
-        'lv', 2, 'Late night workers',
+        'lv', 2, 'Night workers',
         'lv', 3, 'Students',
         'lv', 4, 'Uncategorized',
         'osa', 1, 'Students',
         'osa', 2, 'Uncategorized',
         'osa', 3, '9-5 workers',
-        'osa', 4, 'Late night workers')
+        'osa', 4, 'Night workers')
         
 
 # plot the estimate and std err per each model
@@ -136,7 +136,7 @@ nb_models %>%
   # group = paste0(method, "-", cluster)) %>%
   left_join(cluster_descriptions) %>% 
   mutate(description = factor(description, 
-                              levels = c('9-5 workers', 'Late night workers', 'Students', 'Uncategorized'))) %>% 
+                              levels = c('9-5 workers', 'Night workers', 'Students', 'Uncategorized'))) %>% 
   select(method, description, estimate, std.error) %>% 
   pivot_longer(cols = -c('method', 'description')) %>% 
   ggplot(aes(x = value, y = method, color = description)) +
@@ -144,13 +144,11 @@ nb_models %>%
   facet_grid(description~name, scales = 'free_x') +
   labs(title = "Negative binomial estimates for `year`",
        subtitle = "Models fitted individually by edit distance method and cluster membership",
-       x = "\nValue {difference in log(daily minutes alone)}",
+       x = "\nValue {Annual change in minutes spent alone}",
        y = NULL) +
-  theme(legend.position = 'none')
-ggsave(filename = "Plots/negative_binomial_estimates.png",
-       device = "png",
-       height = 8,
-       width = 7)
+  theme(legend.position = 'none',
+        strip.text.y = element_text(size = 7))
+save_plot("Plots/negative_binomial_estimates", height = 5.5)
 
 # these coefficients are interpreted as roughly a range of +1min to -3min per year depending on the cluster
 # e.g. log(300) - log(299) = 0.003 which equals to exp(0.003) - 1 = 0.003004505 or 0.3% increase annually
@@ -188,12 +186,9 @@ clusters_df %>%
                      breaks = seq(0, 1, by = 0.1)) +
   labs(title = "Percent of respondents who have X cluster memberships",
        subtitle = "1 = total agreement across the clustering methods",
-       x = "Number of cluster memberships per respondent",
+       x = "Number of unique cluster memberships",
        y = "Percent of respondents")
-ggsave(filename = "Plots/cluster_agreement.png",
-       device = "png",
-       height = 5,
-       width = 7)
+save_plot("Plots/cluster_agreement", height = 6)
   
 # overlap of cluster membership
 clusters_df %>% 
@@ -204,8 +199,7 @@ clusters_df %>%
   arrange(ID, method, description) %>% 
   group_by(ID) %>% 
   mutate(entropy = DescTools::Entropy(table(description)),
-         # first = first(description),
-         most_common = names(sort(table(description)))[[1]]) %>% 
+         most_common = names(rev(sort(table(description))))[[1]]) %>% 
   ungroup() %>% 
   arrange(most_common, entropy) %>% 
   mutate(order = row_number()) %>% 
@@ -215,12 +209,9 @@ clusters_df %>%
   labs(title = "Cluster agreement across methods",
        subtitle = "Each row represents a respondent\nThe color represents the cluster they were assigned to under that clustering method",
        x = 'Clustering method',
-       y = 'Respondents')
-ggsave(filename = "Plots/cluster_overlap.png",
-       device = "png",
-       height = 8,
-       width = 7,
-       dpi = 600)
+       y = 'Respondents') +
+  theme(legend.position = 'top')
+save_plot("Plots/cluster_overlap", height = 6, dpi = 600)
 
 
 # fit the mlms ------------------------------------------------------------
@@ -229,6 +220,11 @@ ggsave(filename = "Plots/cluster_overlap.png",
 final_df %>% 
   pivot_longer(cols = contains('cluster'),
                names_to = "method", values_to = "cluster") %>% 
+  # mutate(method = sub(pattern = "*_.*", "", method)) %>% 
+  mutate(method = sub(pattern = "*_.*", "", method),
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+  left_join(cluster_descriptions) %>%
+  select(ID, age, sex, state, alone_minutes, year, method, cluster = description) %>% 
   group_by(method) %>% 
   group_split() %>% 
   set_names(c("hamming_df", "lcs_df", "lv_df", "osa_df")) %>% 
@@ -243,12 +239,12 @@ method_df$year <- method_df$year - min(method_df$year)
 # there's an issue here with duplicate observations
 # alone_time is not continuous, its discrete
 # this ideally would be TRUE
-method_df %>% 
-  select(alone_minutes, cluster, year) %>% 
-  n_distinct() == nrow(method_df)
-method_df %>% 
-  ggplot(aes(x = alone_minutes)) +
-  geom_histogram(binwidth = 1)
+# method_df %>% 
+#   select(alone_minutes, cluster, year) %>% 
+#   n_distinct() == nrow(method_df)
+# method_df %>% 
+#   ggplot(aes(x = alone_minutes)) +
+#   geom_histogram(binwidth = 1)
 # jitter the data to overcome singularities?
 # method_df$alone_minutes <- pmax(0, jitter(method_df$alone_minutes))
 
@@ -286,16 +282,25 @@ mlm_linear <- lme4::lmer(alone_minutes ~ year + (year | cluster), data = method_
 summary(mlm_linear)
 anova(mlm_linear)
 
-# all three models seem to agree that the difference among the clusters in nominal
+
+# fit neg binom -----------------------------------------------------------
+
+mlm_nb <- lme4::glmer.nb(alone_minutes ~ year + (year | cluster), data = method_df, verbose = TRUE)
+summary(mlm_nb)
+anova(mlm_nb)
+
+broom.mixed::tidy(mlm_nb)
+# broom.mixed::augment(mlm_nb)
+broom.mixed::glance(mlm_nb)
 
 
 # plot the results --------------------------------------------------------
 
 # extract the fixed-effect slope
-year_slope <- fixef(mlm_poisson)['year']
+year_slope <- fixef(mlm_nb)['year']
 
 # extract the random-effect slopes
-cluster_slope <- ranef(mlm_poisson)$cluster
+cluster_slope <- ranef(mlm_nb)$cluster
 
 # create a new column for the slope
 cluster_slope$slope <- cluster_slope$year + year_slope
@@ -312,12 +317,9 @@ cluster_slope %>%
   ggplot(aes(x = cluster_ordered, y = slope)) +
   geom_point() +
   coord_flip() +
-  labs(title = "Time alone has been slowly increasing except in cluster 2: students",
-       subtitle = "Poisson MLM with cluster as random intercept and Year as fixed and random slope",
-       caption = "Data from American Time Use Survey 2003-2018",
-       x = "Cluster membership",
-       y = "Yearly change in daily minutes spent alone")
-ggsave(filename = "Plots/hamming_poisson_effects.svg",
-       device = "svg",
-       height = 5,
-       width = 7)
+  labs(title = "MLM negative binomial estimates for `year`",
+       # subtitle = "Cluster as random intercept and Year as fixed and random slope",
+       # caption = "Data from American Time Use Survey 2003-2018",
+       x = NULL,
+       y = "\nAnnual change in minutes spent alone")
+save_plot("Plots/hamming_negbin_mlm_effects", height = 3)

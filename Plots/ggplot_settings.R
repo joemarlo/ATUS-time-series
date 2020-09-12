@@ -45,7 +45,12 @@ options(
   ggplot2.continuous.fill = "viridis"
 )
 
-# set default discrete colors
-# scale_colour_discrete <- function(...) {
-#   scale_color_viridis(..., discrete = TRUE)
-# }
+save_plot <- function(filename, device = 'png', height = 4, width = 6, ...){
+  # wrapper to ggsave with defaults
+  ggsave(...,
+         filename = paste0(filename, ".", device),
+         device = device,
+         height = height,
+         width = width
+         )
+}

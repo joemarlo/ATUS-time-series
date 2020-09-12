@@ -16,7 +16,8 @@ plot(density(demographics_df$TRTALONE))
 demographics_df %>%
   group_by(year) %>% 
   summarize("Alone time excluding work" = mean(TRTALONE),
-            "All alone time" = mean(TRTALONE_WK)) %>% 
+            "All alone time" = mean(TRTALONE_WK),
+            .groups = 'drop') %>% 
   mutate(`All alone time` = ifelse(year <= 2009, NA, `All alone time`)) %>% 
   pivot_longer(cols = c("Alone time excluding work", "All alone time")) %>% 
   ggplot(aes(x = year, y = value, color = name)) +
@@ -25,10 +26,11 @@ demographics_df %>%
        caption = "American Time Use Survey 2003-2018",
        x = "Year",
        y = "Mean minutes per day")
-ggsave(filename = "Plots/mean_alone_time.svg",
-       device = "svg",
+ggsave(filename = "Plots/mean_alone_time.png",
+       device = "png",
        height = 5,
        width = 7)
+save_plot('Plots/mean_alone_time')
 
 # weighted mean minutes
 demographics_df %>%
