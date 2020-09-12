@@ -43,6 +43,27 @@ final_df <- clusters_df %>%
     x <- factor(x, levels = c("Cluster 1", as.character(2:4))) 
     }))
 
+# cluster descriptions based on proportion plots
+cluster_descriptions <- tribble(~method, ~cluster, ~description,
+                                'hamming', 1, '9-5 workers',
+                                'hamming', 2, 'Night workers',
+                                'hamming', 3, 'Students',
+                                'hamming', 4, 'Uncategorized',
+                                'lcs', 1, '9-5 workers',
+                                'lcs', 2, 'Students',
+                                'lcs', 3, 'Uncategorized',
+                                'lv', 1, '9-5 workers',
+                                'lv', 2, 'Night workers',
+                                'lv', 3, 'Students',
+                                'lv', 4, 'Uncategorized',
+                                'osa', 1, 'Students',
+                                'osa', 2, 'Uncategorized',
+                                'osa', 3, '9-5 workers',
+                                'osa', 4, 'Night workers')
+
+
+# plots -------------------------------------------------------------------
+
 # check sample size per method per cluster per year
 final_df %>% 
   pivot_longer(cols = contains('cluster'),
@@ -109,25 +130,6 @@ nb_models <- final_df %>%
   select(-model, -data) %>% 
   ungroup()
 
-# cluster descriptions based on proportion plots
-cluster_descriptions <- tribble(~method, ~cluster, ~description,
-        'hamming', 1, '9-5 workers',
-        'hamming', 2, 'Night workers',
-        'hamming', 3, 'Students',
-        'hamming', 4, 'Uncategorized',
-        'lcs', 1, '9-5 workers',
-        'lcs', 2, 'Students',
-        'lcs', 3, 'Uncategorized',
-        'lv', 1, '9-5 workers',
-        'lv', 2, 'Night workers',
-        'lv', 3, 'Students',
-        'lv', 4, 'Uncategorized',
-        'osa', 1, 'Students',
-        'osa', 2, 'Uncategorized',
-        'osa', 3, '9-5 workers',
-        'osa', 4, 'Night workers')
-        
-
 # plot the estimate and std err per each model
 nb_models %>% 
   filter(term == 'year') %>% 
@@ -144,7 +146,7 @@ nb_models %>%
   facet_grid(description~name, scales = 'free_x') +
   labs(title = "Negative binomial estimates for `year`",
        subtitle = "Models fitted individually by edit distance method and cluster membership",
-       x = "\nValue {Annual change in minutes spent alone}",
+       x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none',
         strip.text.y = element_text(size = 7))
@@ -214,7 +216,7 @@ clusters_df %>%
 save_plot("Plots/cluster_overlap", height = 6, dpi = 600)
 
 
-# fit the mlms ------------------------------------------------------------
+# prep the data -----------------------------------------------------------
 
 # split the data by cluster into individual dataframes
 final_df %>% 
@@ -255,6 +257,9 @@ method_df$year <- method_df$year - min(method_df$year)
 #                       data = method_df)
 # summary(zip_model)
 
+
+# fit the mlms ------------------------------------------------------------
+
 # fit poisson and negative binomial
 summary(glm(alone_minutes ~ year + cluster, data = method_df, family = "poisson"))
 summary(MASS::glm.nb(alone_minutes ~ year + cluster, data = method_df))
@@ -275,7 +280,7 @@ getME(mlm_nb, 'lower')
 
 # restart
 ss <- getME(mlm_nb, c("theta","fixef"))
-m2 <- update(mlm_nb, start = ss, control = glmerControl(optimizer="bobyqa", optCtrl = list(maxfun = 2e8)))
+m2 <- update(mlm_nb, start = ss, control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e8)))
 #https://rstudio-pubs-static.s3.amazonaws.com/33653_57fc7b8e5d484c909b615d8633c01d51.html
 
 mlm_linear <- lme4::lmer(alone_minutes ~ year + (year | cluster), data = method_df)
@@ -292,14 +297,14 @@ anova(mlm_nb)
 broom.mixed::tidy(mlm_nb)
 # broom.mixed::augment(mlm_nb)
 broom.mixed::glance(mlm_nb)
-
+coef(mlm_nb)
 
 # plot the results --------------------------------------------------------
 
 # extract the fixed-effect slope
 year_slope <- fixef(mlm_nb)['year']
 
-# extract the random-effect slopes
+# extract the random-effect slopes (this is the conditional mode)
 cluster_slope <- ranef(mlm_nb)$cluster
 
 # create a new column for the slope
@@ -309,6 +314,7 @@ cluster_slope$slope <- cluster_slope$year + year_slope
 cluster_slope$cluster <- rownames(cluster_slope)
 
 # plot the slopes
+# TODO add some illustration of the variability of the BLUPS
 cluster_slope %>% 
   ggplot(aes(x = reorder(cluster, slope), y = slope, color = cluster)) +
   geom_point() +
@@ -317,6 +323,25 @@ cluster_slope %>%
        # subtitle = "Cluster as random intercept and Year as fixed and random slope",
        # caption = "Data from American Time Use Survey 2003-2018",
        x = NULL,
-       y = "\nAnnual change in minutes spent alone") +
+       y = "\nAnnual change in time spent alone") +
   theme(legend.position = 'none')
 save_plot("Plots/hamming_negbin_mlm_effects", height = 3)
+
+
+# plot the 95% confidence range of the fixed effects
+# takes ~30min
+nb_confint <- confint.merMod(mlm_nb, method = 'boot', .progress = "txt")
+# confint.merMod(mlm_nb, method = 'Wald') %>% 
+nb_confint %>% 
+  data.frame() %>% 
+  rownames_to_column() %>%
+  filter(rowname != "(Intercept)") %>% 
+  # .[4:5,] %>% 
+  # mutate(estimate = fixef(mlm_nb)) %>% 
+  ggplot(aes(x = rowname, ymin = X2.5.., ymax = X97.5..)) +
+  # geom_point() +
+  geom_linerange() + 
+  coord_flip() +
+  labs(title = "95% confidence interval of MLM fixed-effects",
+       x = NULL,
+       y = "Annual change in time spent alone")

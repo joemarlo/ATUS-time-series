@@ -34,6 +34,10 @@ library(tidyverse)
 panderOptions('big.mark', ',')
 ```
 
+```{r}
+#rmarkdown::render("loneliest_american.Rmd")
+```
+
 
 \newpage
 
@@ -211,23 +215,38 @@ The model form in R syntax:
 \texttt{Alone time $\sim$ cluster + (cluster | year )}
 \end{center}
 
+
 ## Model fit
 
 Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
 
-confidence intervals
 
 
-
-```{r out.width="80%", fig.align='center', fig.cap="caption",fig.show='hold'}
-# knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
+```{r}
+broom.mixed::tidy(mlm_nb) %>% 
+  .[, 1:6] %>% 
+  pander::pander(justify = 'lllrrr',
+                 digits = 4,
+                 round = 4,
+                 caption = 'Multi-level negative binomial model diagnostics')
+broom.mixed::glance(mlm_nb) %>% 
+  pander::pander(justify = 'rrrrrr',
+                 caption = 'Multi-level negative binomial model diagnostics')
 ```
+
 
 ## Model interpretation
 
 ```{r out.width="80%", fig.align='center', fig.cap="Hamming edit distance: Multi-level negative binomial effects",fig.show='hold'}
 knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
 ```
+
+how to show spread of model estimates ?
+
+```{r out.width="80%", fig.align='center', fig.cap="caption",fig.show='hold'}
+knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
+```
+
 
 
 # Associated demographics
@@ -251,11 +270,6 @@ Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis. Ultricies m
 ```{r out.width="80%", fig.align='center', fig.cap="Densities of alone time by cluster",fig.show='hold'}
 knitr::include_graphics("Plots/alone_time_densities.png")
 ```
-
-```{r out.width="83%", fig.align='center', fig.cap="Alone time by US state",fig.show='hold'}
-knitr::include_graphics("Plots/alone_time_by_state.png")
-```
-
 
 ```{r}
 tribble(
@@ -303,3 +317,6 @@ tribble(
                  caption = 'Activity aggregation mapping')
 ```
 
+```{r out.width="83%", fig.align='center', fig.cap="Alone time by US state",fig.show='hold'}
+knitr::include_graphics("Plots/alone_time_by_state.png")
+```

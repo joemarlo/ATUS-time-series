@@ -70,10 +70,11 @@ hclust_sw$All.index %>%
                          " respondents"),
        x = 'n clusters',
        y = 'Silhouette width')
-ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_silhouette.svg"),
-       device = "svg",
-       height = 5,
-       width = 7)
+save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_silhouette"))
+# ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_silhouette.svg"),
+#        device = "svg",
+#        height = 5,
+#        width = 7)
 
 
 # re-cluster using a larger sample ----------------------------------------
@@ -161,39 +162,37 @@ ggd1$segments$col[is.na(ggd1$segments$col)] <- 'grey50'
 text_labels <- tribble(
   ~label, ~x, ~y,
   'Cluster 1', 4500, -70,
-  'Cluster 2', 11250, -70,
-  'Cluster 3', 14250, -70,
+  '2', 11900, -70,
+  '3', 13100, -70,
   'Cluster 4', 19000, -70
 )
 # OSA
-text_labels <- tribble(
-  ~label, ~x, ~y,
-  'Cluster 1', 1000, -70,
-  'Cluster 2', 7000, -70,
-  'Cluster 3', 17000, -70,
-  'Cluster 4', 24000, -70
-)
-
-# LCS
-text_labels <- tribble(
-  ~label, ~x, ~y,
-  'Cluster 1', 4500, -90,
-  'Cluster 2', 13250, -90,
-  'Cluster 3', 19000, -90
-)
+# text_labels <- tribble(
+#   ~label, ~x, ~y,
+#   'Cluster 1', 1000, -70,
+#   'Cluster 2', 7000, -70,
+#   'Cluster 3', 17000, -70,
+#   'Cluster 4', 24000, -70
+# )
+# 
+# # LCS
+# text_labels <- tribble(
+#   ~label, ~x, ~y,
+#   'Cluster 1', 4500, -90,
+#   'Cluster 2', 13250, -90,
+#   'Cluster 3', 19000, -90
+# )
 
 # plot the dendrogram
 ggplot(ggd1$segments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = ggd1$segments$col,
                linetype = ggd1$segments$linetype, lwd = 0.6, alpha = 0.7) +
   geom_text(data = text_labels, aes(label = label, x = x, y = y), family = 'Helvetica') +
-  # coord_cartesian(ylim = c(100, 2500), clip = 'off') +
-  coord_cartesian(ylim = c(100, 4500), clip = 'off') +
+  coord_cartesian(ylim = c(100, 2500), clip = 'off') +
+  # coord_cartesian(ylim = c(100, 4500), clip = 'off') +
   scale_x_continuous(labels = NULL) +
   scale_y_continuous(labels = NULL) +
-  labs(title = paste0(distance_method_pretty, 
-                      ' edit distance: ', hcl_k, 
-                      ' cluster solution with Ward (D2) linkage'),
+  labs(title =paste0(distance_method_pretty, ' edit distance with Ward (D2) linkage'),
        subtitle = paste0("Weighted sample of ", 
                          scales::comma_format()(n_sample),
                          " respondents"),
@@ -203,10 +202,7 @@ ggplot(ggd1$segments) +
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.position = 'none')
-ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_dendrogram.svg"),
-       device = "svg",
-       height = 5,
-       width = 7)
+save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_dendrogram"))
 
 
 # examine the cluster sequences -------------------------------------------
@@ -250,16 +246,15 @@ atus_samp %>%
   scale_x_continuous(labels = labels,
                      breaks = seq(0, 48, by = 4)) +
   facet_wrap(~cluster, ncol = 2, scales = 'free_y') +
-  labs(title = "Sequence plots of each individual's day by cluster",
-       subtitle = paste0("Based on ", distance_method_pretty, 
-                         " edit distance and Ward D2 clustering\nEach row represents an individual person's day, sorted by Shannon entropy"),
+  labs(title = paste0(distance_method_pretty, ' edit distance and Ward D2 clustering'),
+       subtitle = paste0("Each row represents an individual respondent's day"),
        x = "Time of day", 
        y = "Individuals") +
   theme(legend.position = 'right')
-ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_sequence_plots.png"),
-       device = "png",
-       height = 6,
-       width = 9)
+save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_sequence_plots"),
+          height = 5,
+          width = 8,
+          dpi = 700)
 
 # plots of proportion of individuals participating in a given activity for a given time period
 atus_samp %>% 
@@ -275,18 +270,17 @@ atus_samp %>%
                      breaks = seq(0, 48, by = 4)) +
   scale_y_continuous(labels = NULL) +
   facet_wrap(~cluster, ncol = 2) +
-  labs(title = "Observed proportion of activities by cluster",
-       subtitle = paste0("Based on ", distance_method_pretty, 
-                         " edit distance and Ward D2 clustering\n"),
+  labs(title = paste0(distance_method_pretty, ' edit distance and Ward D2 clustering'),
+       subtitle = "Observed proportion of activities by cluster",
        x = "Time of day",
        y = "Proportion") +
   theme(legend.position = 'right',
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_blank())
-ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_proportion_plots.png"),
-       device = "png",
-       height = 6,
-       width = 9)
+save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_proportion_plots"),
+          height = 5,
+          width = 8,
+          dpi = 700)
 
 
 # write out cluster membership --------------------------------------------
@@ -295,4 +289,7 @@ atus_string_samp %>%
   select(ID, cluster) %>% 
   rename_with(function(x) paste0(distance_method, "_cluster"), .cols = cluster) %>% 
   write_csv(path = paste0("Analyses/", distance_method_pretty, "/", distance_method_pretty, "_clusters.csv"))
+
+save(hclust_sw, dist_matrix, hcl_ward,
+     file = paste0("Analyses/", distance_method_pretty, "/", distance_method_pretty, "_cluster_data.Rdata"))
 

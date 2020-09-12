@@ -6,3 +6,5 @@
 Inputs/*.tsv
 .DS_Store
 .DS_store
+
+Analyses/**/*.Rdata

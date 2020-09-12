@@ -15,12 +15,12 @@ See also: [ATUS repo](https://github.com/joemarlo/ATUS)
 
 <br>
 <p align="center">
-<img src="Analyses/Levenshtein/Plots/Levenshtein_dendrogram.svg" width=79%>
+<img src="Analyses/Levenshtein/Plots/Levenshtein_dendrogram.png" width=79%>
 </p>
 
 <br>
 <p align="center">
-<img src="Analyses/Levenshtein/Plots/Levenshtein_silhouette.svg" width=79%>
+<img src="Analyses/Levenshtein/Plots/Levenshtein_silhouette.png" width=79%>
 </p>
 
 <br>
