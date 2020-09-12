@@ -42,7 +42,7 @@ panderOptions('big.mark', ',')
 Time spent alone has been increasing among Americans. This can have numerous health effects (x,y,z) and it may be impacting subpopulations differently. Data from the American Time Use Survey shows the mean amount of time spent on non-work activities with no other person present has steadily increased from ~295min per day to ~330min per day.
 
 
-```{r out.width="60%", fig.align='center', fig.cap="caption",fig.show='hold'}
+```{r out.width="60%", fig.align='center', fig.cap="Mean alone time 2003-2018",fig.show='hold'}
 knitr::include_graphics("Plots/mean_alone_time.png")
 ```
 
@@ -190,7 +190,7 @@ Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui fa
 
 ## Multiple single level negative binomials
 
-```{r out.width="80%", fig.align='center', fig.cap="caption",fig.show='hold'}
+```{r out.width="80%", fig.align='center', fig.cap="Negative binomial estimates",fig.show='hold'}
 knitr::include_graphics("Plots/negative_binomial_estimates.png")
 ```
 
@@ -225,7 +225,7 @@ confidence intervals
 
 ## Model interpretation
 
-```{r out.width="80%", fig.align='center', fig.cap="caption",fig.show='hold'}
+```{r out.width="80%", fig.align='center', fig.cap="Hamming edit distance: Multi-level negative binomial effects",fig.show='hold'}
 knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
 ```
 
@@ -247,6 +247,15 @@ Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis. Ultricies m
 \newpage
 
 # Appendix
+
+```{r out.width="80%", fig.align='center', fig.cap="Densities of alone time by cluster",fig.show='hold'}
+knitr::include_graphics("Plots/alone_time_densities.png")
+```
+
+```{r out.width="83%", fig.align='center', fig.cap="Alone time by US state",fig.show='hold'}
+knitr::include_graphics("Plots/alone_time_by_state.png")
+```
+
 
 ```{r}
 tribble(

@@ -57,7 +57,7 @@ cluster_descriptions <- tribble(~method, ~cluster, ~description,
                                 'osa', 3, '9-5 workers',
                                 'osa', 4, 'Night workers')
 
-
+# distribution of alone time by cluster
 clusters_df %>% 
   left_join(demographics, by = "ID") %>% 
   select(ID, contains("cluster"), age, sex, state, race, alone_minutes = TRTALONE, year, student = TESCHFT) %>% 
@@ -70,7 +70,12 @@ clusters_df %>%
   mutate(method = sub(pattern = "*_.*", "", method)) %>% 
   left_join(cluster_descriptions) %>% 
   filter(alone_minutes != -1) %>% 
-  ggplot(aes(x = alone_minutes)) +
-  geom_density() +
-  facet_grid(description ~ method, scales = 'free_y')
-
+  ggplot(aes(x = alone_minutes, color = method, fill = method)) +
+  geom_density(alpha = 0.3) +
+  scale_x_continuous(labels = scales::comma_format()) +
+  facet_grid(~ description, scales = 'free_y') +
+  labs(title = "Distribution of alone time by cluster and edit distance",
+       x = "Daily minutes alone",
+       y = NULL) +
+  theme(axis.text.x = element_text(angle = 35, hjust = 1))
+save_plot("Plots/alone_time_densities", height = 3.5)

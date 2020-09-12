@@ -184,7 +184,7 @@ clusters_df %>%
   geom_bar(aes(y = ..count.. / sum(..count..))) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1.0),
                      breaks = seq(0, 1, by = 0.1)) +
-  labs(title = "Percent of respondents who have X cluster memberships",
+  labs(title = "Cluster agreement across methods summarized",
        subtitle = "1 = total agreement across the clustering methods",
        x = "Number of unique cluster memberships",
        y = "Percent of respondents")
@@ -206,7 +206,7 @@ clusters_df %>%
   ggplot(aes(x = method, y = reorder(as.factor(ID), order), fill = description)) +
   geom_tile() +
   scale_y_discrete(labels = NULL) +
-  labs(title = "Cluster agreement across methods",
+  labs(title = "Cluster agreement across methods by respondent",
        subtitle = "Each row represents a respondent\nThe color represents the cluster they were assigned to under that clustering method",
        x = 'Clustering method',
        y = 'Respondents') +
@@ -308,18 +308,15 @@ cluster_slope$slope <- cluster_slope$year + year_slope
 # use the row names to create a cluster name column
 cluster_slope$cluster <- rownames(cluster_slope)
 
-# create an ordered cluster-level factor based upon slope values
-cluster_slope$cluster_ordered <- factor(cluster_slope$cluster,
-                                        levels = cluster_slope$cluster[order(cluster_slope$slope)])
-
 # plot the slopes
 cluster_slope %>% 
-  ggplot(aes(x = cluster_ordered, y = slope)) +
+  ggplot(aes(x = reorder(cluster, slope), y = slope, color = cluster)) +
   geom_point() +
   coord_flip() +
   labs(title = "MLM negative binomial estimates for `year`",
        # subtitle = "Cluster as random intercept and Year as fixed and random slope",
        # caption = "Data from American Time Use Survey 2003-2018",
        x = NULL,
-       y = "\nAnnual change in minutes spent alone")
+       y = "\nAnnual change in minutes spent alone") +
+  theme(legend.position = 'none')
 save_plot("Plots/hamming_negbin_mlm_effects", height = 3)

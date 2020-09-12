@@ -70,10 +70,7 @@ demographics_df %>%
         axis.ticks = element_blank(),
         legend.title = element_text(hjust = 0),
         legend.position = 'right')
-ggsave(filename = "Plots/alone_time_by_state.png",
-       device = "png",
-       height = 7,
-       width = 9)
+save_plot("Plots/alone_time_by_state")
 
 
 # glmer -------------------------------------------------------------------
