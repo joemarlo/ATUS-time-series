@@ -23,7 +23,7 @@ n_sample <- nrow(atus_string_samp)
 # distance ----------------------------------------------------------------
 
 # compute the string distances
-distance_method <- "lv" # "lv" "hamming" "osa" "lcs"
+distance_method <- "lcs" # "lv" "hamming" "osa" "lcs"
 distance_method_pretty <- case_when(distance_method == 'hamming' ~ "Hamming",
                                     distance_method == 'osa' ~ "OSA",
                                     distance_method == 'lcs' ~ 'LCS',
@@ -162,34 +162,34 @@ ggd1$segments$col[is.na(ggd1$segments$col)] <- 'grey50'
 text_labels <- tribble(
   ~label, ~x, ~y,
   'Cluster 1', 4500, -70,
-  '2', 11900, -70,
+  '2', 11500, -70,
   '3', 13100, -70,
   'Cluster 4', 19000, -70
 )
 # OSA
-# text_labels <- tribble(
-#   ~label, ~x, ~y,
-#   'Cluster 1', 1000, -70,
-#   'Cluster 2', 7000, -70,
-#   'Cluster 3', 17000, -70,
-#   'Cluster 4', 24000, -70
-# )
-# 
-# # LCS
-# text_labels <- tribble(
-#   ~label, ~x, ~y,
-#   'Cluster 1', 4500, -90,
-#   'Cluster 2', 13250, -90,
-#   'Cluster 3', 19000, -90
-# )
+text_labels <- tribble(
+  ~label, ~x, ~y,
+  'Cluster 1', 1000, -70,
+  'Cluster 2', 7000, -70,
+  'Cluster 3', 17000, -70,
+  'Cluster 4', 24000, -70
+)
+
+# LCS
+text_labels <- tribble(
+  ~label, ~x, ~y,
+  'Cluster 1', 4500, -90,
+  'Cluster 2', 13250, -90,
+  'Cluster 3', 19000, -90
+)
 
 # plot the dendrogram
 ggplot(ggd1$segments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = ggd1$segments$col,
                linetype = ggd1$segments$linetype, lwd = 0.6, alpha = 0.7) +
   geom_text(data = text_labels, aes(label = label, x = x, y = y), family = 'Helvetica') +
-  coord_cartesian(ylim = c(100, 2500), clip = 'off') +
-  # coord_cartesian(ylim = c(100, 4500), clip = 'off') +
+  # coord_cartesian(ylim = c(100, 2500), clip = 'off') +
+  coord_cartesian(ylim = c(100, 4500), clip = 'off') +
   scale_x_continuous(labels = NULL) +
   scale_y_continuous(labels = NULL) +
   labs(title =paste0(distance_method_pretty, ' edit distance with Ward (D2) linkage'),

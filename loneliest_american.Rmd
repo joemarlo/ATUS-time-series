@@ -241,12 +241,11 @@ broom.mixed::glance(mlm_nb) %>%
 knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
 ```
 
-how to show spread of model estimates ?
+There's an issue here with singularities
 
-```{r out.width="80%", fig.align='center', fig.cap="caption",fig.show='hold'}
-knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
+```{r out.width="80%", fig.align='center', fig.cap="All edit distance measures: Multi-level negative binomial effects",fig.show='hold'}
+knitr::include_graphics("Plots/negbin_mlm_effects_all_methods.png")
 ```
-
 
 
 # Associated demographics
@@ -318,5 +317,5 @@ tribble(
 ```
 
 ```{r out.width="83%", fig.align='center', fig.cap="Alone time by US state",fig.show='hold'}
-knitr::include_graphics("Plots/alone_time_by_state.png")
+# knitr::include_graphics("Plots/alone_time_by_state.png")
 ```

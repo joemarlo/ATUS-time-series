@@ -73,9 +73,9 @@ clusters_df %>%
   ggplot(aes(x = alone_minutes, color = method, fill = method)) +
   geom_density(alpha = 0.3) +
   scale_x_continuous(labels = scales::comma_format()) +
-  facet_grid(~ description, scales = 'free_y') +
+  facet_wrap(~ description, scales = 'free_y', nrow = 2) +
   labs(title = "Distribution of alone time by cluster and edit distance",
        x = "Daily minutes alone",
        y = NULL) +
   theme(axis.text.x = element_text(angle = 35, hjust = 1))
-save_plot("Plots/alone_time_densities", height = 3.5)
+save_plot("Plots/alone_time_densities", height = 6)

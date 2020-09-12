@@ -125,8 +125,12 @@ nb_models <- final_df %>%
   group_by(method, cluster) %>% 
   nest() %>% 
   mutate(model = map(data, function(df) MASS::glm.nb(alone_minutes ~ year, data = df)),
-         tidied = map(model, broom::tidy)) %>% 
-  unnest(tidied) %>% 
+         tidied = map(model, broom::tidy),
+         confint = map(model, function(model){
+           cf <- confint(model)
+           tibble(lower = cf[2,1], upper = cf[2,2])
+                })) %>% 
+  unnest(c(tidied, confint)) %>% 
   select(-model, -data) %>% 
   ungroup()
 
@@ -135,22 +139,22 @@ nb_models %>%
   filter(term == 'year') %>% 
   mutate(method = sub(pattern = "*_.*", "", method),
          cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
-  # group = paste0(method, "-", cluster)) %>%
   left_join(cluster_descriptions) %>% 
   mutate(description = factor(description, 
-                              levels = c('9-5 workers', 'Night workers', 'Students', 'Uncategorized'))) %>% 
-  select(method, description, estimate, std.error) %>% 
-  pivot_longer(cols = -c('method', 'description')) %>% 
-  ggplot(aes(x = value, y = method, color = description)) +
+                              levels = c('9-5 workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
+  select(method, description, estimate, lower, upper) %>% 
+  # pivot_longer(cols = estimate) %>% 
+  ggplot(aes(x = estimate, y = method, xmin = lower, xmax = upper, color = description)) +
   geom_point() +
-  facet_grid(description~name, scales = 'free_x') +
-  labs(title = "Negative binomial estimates for `year`",
+  geom_linerange() + 
+  facet_grid(description~., scales = 'free_x') +
+  labs(title = "Negative binomial estimates and 95% confidence interval",
        subtitle = "Models fitted individually by edit distance method and cluster membership",
        x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none',
         strip.text.y = element_text(size = 7))
-save_plot("Plots/negative_binomial_estimates", height = 5.5)
+save_plot("Plots/negative_binomial_estimates", height = 5.5, width = 6.5)
 
 # these coefficients are interpreted as roughly a range of +1min to -3min per year depending on the cluster
 # e.g. log(300) - log(299) = 0.003 which equals to exp(0.003) - 1 = 0.003004505 or 0.3% increase annually
@@ -186,7 +190,7 @@ clusters_df %>%
   geom_bar(aes(y = ..count.. / sum(..count..))) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1.0),
                      breaks = seq(0, 1, by = 0.1)) +
-  labs(title = "Cluster agreement across methods summarized",
+  labs(title = "Cluster agreement across methods",
        subtitle = "1 = total agreement across the clustering methods",
        x = "Number of unique cluster memberships",
        y = "Percent of respondents")
@@ -299,7 +303,77 @@ broom.mixed::tidy(mlm_nb)
 broom.mixed::glance(mlm_nb)
 coef(mlm_nb)
 
-# plot the results --------------------------------------------------------
+
+# ploting random effects --------------------------------------------------
+
+# extract the var-cov matrices
+# cov_var_matrices <- attr(ranef(mlm_nb, condVar = TRUE)[[1]], "postVar")
+
+# extract the standard error of the random errors
+standard_errors <- arm::se.ranef(mlm_nb)$cluster[,'year']
+
+# plot the BLUPs and their SE
+coef(mlm_nb)$cluster %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  mutate(lower = year - (1.96 * standard_errors),
+         upper = year + (1.96 * standard_errors)) %>% 
+  ggplot(aes(x = year, y = reorder(rowname, year), 
+             xmin = lower, xmax = upper, color = rowname)) +
+  geom_point() +
+  geom_linerange() +
+  labs(title = "Negative binomial random effects and 95% confidence interval",
+       subtitle = "Multi-level model fitted on the Hamming clusters",
+       x = "\nAnnual change in time spent alone",
+       y = NULL) +
+  theme(legend.position = 'none')
+save_plot("Plots/hamming_negbin_mlm_effects", height = 4, width = 7.2)
+
+# repeat for all clustering methods
+nb_mlm_models <- final_df %>% 
+  mutate(year = year - min(year)) %>% 
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>% 
+  mutate(method = sub(pattern = "*_.*", "", method),
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+  left_join(cluster_descriptions) %>%
+  select(alone_minutes, year, method, cluster = description) %>% 
+  group_by(method) %>% 
+  nest() %>% 
+  mutate(model = map(data, function(df) lme4::glmer.nb(alone_minutes ~ year + (year | cluster), data = df, verbose = TRUE)))
+
+# calculate confidence interval and plot
+nb_mlm_models %>% 
+  mutate(tidied = map(model, function(model){
+    # extract the standard error of the random errors
+    standard_errors <- arm::se.ranef(model)$cluster[,'year']       
+    
+    # calculate the confidence interval
+    coef(model)$cluster %>%
+      as.data.frame() %>%
+      rownames_to_column() %>%
+      mutate(lower = year - (1.96 * standard_errors),
+             upper = year + (1.96 * standard_errors))
+         })) %>% 
+  unnest(tidied) %>% 
+  select(method, description = rowname, estimate = year, lower, upper) %>% 
+  ungroup() %>% 
+  mutate(description = factor(description, 
+                              levels = c('9-5 workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
+  ggplot(aes(x = estimate, y = method, xmin = lower, xmax = upper, color = description)) +
+  geom_point() +
+  geom_linerange() + 
+  facet_grid(description~., scales = 'free_x') +
+  labs(title = "Negative binomial estimates and 95% confidence interval",
+       subtitle = "MLM models fitted individually by edit distance method ",
+       x = "\nAnnual change in time spent alone",
+       y = NULL) +
+  theme(legend.position = 'none',
+        strip.text.y = element_text(size = 7))
+save_plot("Plots/negbin_mlm_effects_all_methods", height = 5.5, width = 7.2)
+
+
+#  plot the results: old method -------------------------------------------
 
 # extract the fixed-effect slope
 year_slope <- fixef(mlm_nb)['year']
@@ -325,23 +399,5 @@ cluster_slope %>%
        x = NULL,
        y = "\nAnnual change in time spent alone") +
   theme(legend.position = 'none')
-save_plot("Plots/hamming_negbin_mlm_effects", height = 3)
+# save_plot("Plots/hamming_negbin_mlm_effects", height = 3)
 
-
-# plot the 95% confidence range of the fixed effects
-# takes ~30min
-nb_confint <- confint.merMod(mlm_nb, method = 'boot', .progress = "txt")
-# confint.merMod(mlm_nb, method = 'Wald') %>% 
-nb_confint %>% 
-  data.frame() %>% 
-  rownames_to_column() %>%
-  filter(rowname != "(Intercept)") %>% 
-  # .[4:5,] %>% 
-  # mutate(estimate = fixef(mlm_nb)) %>% 
-  ggplot(aes(x = rowname, ymin = X2.5.., ymax = X97.5..)) +
-  # geom_point() +
-  geom_linerange() + 
-  coord_flip() +
-  labs(title = "95% confidence interval of MLM fixed-effects",
-       x = NULL,
-       y = "Annual change in time spent alone")
