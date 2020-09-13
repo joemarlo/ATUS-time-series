@@ -125,6 +125,7 @@ nb_models <- final_df %>%
   group_by(method, cluster) %>% 
   nest() %>% 
   mutate(model = map(data, function(df) MASS::glm.nb(alone_minutes ~ year, data = df)),
+         #model = map(data, function(df) glm(alone_minutes ~ year, data = df, family = 'poisson')),
          tidied = map(model, broom::tidy),
          confint = map(model, function(model){
            cf <- confint(model)
@@ -324,38 +325,40 @@ nb_mlm_models <- final_df %>%
   # distinct() %>% 
   nest() %>% 
   mutate(model = map(data, function(df){
-    lme4::glmer.nb(alone_minutes ~ year + (year | cluster), 
-                   data = df, verbose = TRUE, 
-                   # initCtrl = list(theta = 1.122),
-                   control = glmerControl(optCtrl = list(maxfun = 1e5)))
+    # lme4::glmer.nb(alone_minutes ~ year + (year | cluster), 
+    #                data = df, verbose = TRUE, 
+    #                # initCtrl = list(theta = 1.122),
+    #                control = glmerControl(optCtrl = list(maxfun = 1e5)))
                    # control = glmerControl(optimizer = "Nelder_Mead",
                    #                        optCtrl = list(maxfun = 1e6)))
     # theta parameter pulled from first fitting model to the hamming group
     # this fixes convergence errors for the other models
+    lme4::glmer(alone_minutes ~ year + (year | cluster), data = df, family = "poisson")
+    
   }))
 
 
-dat <- final_df %>% 
-  mutate(year = year - min(year)) %>% 
-  pivot_longer(cols = contains('cluster'),
-               names_to = "method", values_to = "cluster") %>% 
-  mutate(method = sub(pattern = "*_.*", "", method),
-         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
-  left_join(cluster_descriptions) %>%
-  select(alone_minutes, year, method, cluster = description) %>% 
-  filter(method == 'lcs')
-
-tmp_lcs  <- lme4::glmer.nb(alone_minutes ~ year + (year | cluster), data = dat, verbose = TRUE)  
-
-summary(tmp_lcs)
-anova(tmp_lcs)
-getME(tmp_lcs, 'theta')
-getME(tmp_lcs, 'lower')
-
-# restart
-ss <- getME(nb_mlm_models$model[[1]], c("theta","fixef"))
-m2 <- update(tmp_lcs, start = ss, control = glmerControl(optimizer = "Nelder_Mead", tolPwrss = 1e-8,
-                                                         optCtrl = list()))
+# dat <- final_df %>% 
+#   mutate(year = year - min(year)) %>% 
+#   pivot_longer(cols = contains('cluster'),
+#                names_to = "method", values_to = "cluster") %>% 
+#   mutate(method = sub(pattern = "*_.*", "", method),
+#          cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+#   left_join(cluster_descriptions) %>%
+#   select(alone_minutes, year, method, cluster = description) %>% 
+#   filter(method == 'lcs')
+# 
+# tmp_lcs  <- lme4::glmer.nb(alone_minutes ~ year + (year | cluster), data = dat, verbose = TRUE)  
+# 
+# summary(tmp_lcs)
+# anova(tmp_lcs)
+# getME(tmp_lcs, 'theta')
+# getME(tmp_lcs, 'lower')
+# 
+# # restart
+# ss <- getME(nb_mlm_models$model[[1]], c("theta","fixef"))
+# m2 <- update(tmp_lcs, start = ss, control = glmerControl(optimizer = "Nelder_Mead", tolPwrss = 1e-8,
+#                                                          optCtrl = list()))
 
 # calculate confidence interval and plot
 nb_mlm_models %>% 
@@ -374,7 +377,7 @@ nb_mlm_models %>%
   select(method, description = rowname, estimate = year, lower, upper) %>% 
   ungroup() %>% 
   mutate(description = factor(description, 
-                              levels = c('9-5 workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
+                              levels = c('Day workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
   ggplot(aes(x = estimate, y = method, xmin = lower, xmax = upper, color = description)) +
   geom_point() +
   geom_linerange() + 
@@ -385,7 +388,7 @@ nb_mlm_models %>%
        y = NULL) +
   theme(legend.position = 'none',
         strip.text.y = element_text(size = 7))
-save_plot("Plots/negbin_mlm_effects_all_methods", height = 5.5, width = 7.2)
+save_plot("Plots/negbin_mlm_effects_all_methods", height = 5.5, width = 6.5)
 
 
 #  plot the results: old method -------------------------------------------

@@ -200,7 +200,7 @@ Over-dispersion is an issue. The mean daily alone minutes range from 202 to 400 
 
 ## Multiple single level negative binomials
 
-```{r out.width="80%", fig.align='center', fig.cap="Negative binomial estimates",fig.show='hold'}
+```{r out.width="75%", fig.align='center', fig.cap="Negative binomial estimates",fig.show='hold'}
 knitr::include_graphics("Plots/negative_binomial_estimates.png")
 ```
 
@@ -261,6 +261,13 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
 
 
+explore other cluster solutions here that identify the elderly?
+The Hamming, Levenshtein, and OSA edit distance measures indicate that five or possibly six clusters are reasonable (Figure 6). The six-cluster solution .... contains clusters can be categorized as ...
+
+The associated demographics of these clusters skew ...
+
+
+
 # Conclusion
 
 Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
@@ -319,6 +326,10 @@ tribble(
                  caption = 'Activity aggregation mapping')
 ```
 
-```{r out.width="83%", fig.align='center', fig.cap="Alone time by US state",fig.show='hold'}
-# knitr::include_graphics("Plots/alone_time_by_state.png")
+```{r out.width="83%", fig.align='center', fig.cap="Poisson single-level effects",fig.show='hold'}
+knitr::include_graphics("Plots/poisson_effects_all_methods.png")
+```
+
+```{r out.width="83%", fig.align='center', fig.cap="Poisson MLM effects",fig.show='hold'}
+knitr::include_graphics("Plots/poisson_mlm_effects_all_methods.png")
 ```

@@ -4,8 +4,6 @@ Finding differences in time spent alone among subpopulations of Americans. First
 
 See also: [ATUS repo](https://github.com/joemarlo/ATUS)
 
-[Working doc](https://docs.google.com/document/d/16B8pjYeZv6RtWNh5Pqtz7to9whLEk2FyR-4FSyXgOe4/edit?usp=sharing)
-
 
 <br>
 <br>
