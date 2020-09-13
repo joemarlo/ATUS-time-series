@@ -45,20 +45,20 @@ final_df <- clusters_df %>%
 
 # cluster descriptions based on proportion plots
 cluster_descriptions <- tribble(~method, ~cluster, ~description,
-                                'hamming', 1, '9-5 workers',
+                                'hamming', 1, 'Day workers',
                                 'hamming', 2, 'Night workers',
                                 'hamming', 3, 'Students',
                                 'hamming', 4, 'Uncategorized',
-                                'lcs', 1, '9-5 workers',
+                                'lcs', 1, 'Day workers',
                                 'lcs', 2, 'Students',
                                 'lcs', 3, 'Uncategorized',
-                                'lv', 1, '9-5 workers',
+                                'lv', 1, 'Day workers',
                                 'lv', 2, 'Night workers',
                                 'lv', 3, 'Students',
                                 'lv', 4, 'Uncategorized',
                                 'osa', 1, 'Students',
                                 'osa', 2, 'Uncategorized',
-                                'osa', 3, '9-5 workers',
+                                'osa', 3, 'Day workers',
                                 'osa', 4, 'Night workers')
 
 
@@ -131,7 +131,7 @@ nb_models <- final_df %>%
            tibble(lower = cf[2,1], upper = cf[2,2])
                 })) %>% 
   unnest(c(tidied, confint)) %>% 
-  select(-model, -data) %>% 
+  select(-data) %>% 
   ungroup()
 
 # plot the estimate and std err per each model
@@ -141,7 +141,7 @@ nb_models %>%
          cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
   left_join(cluster_descriptions) %>% 
   mutate(description = factor(description, 
-                              levels = c('9-5 workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
+                              levels = c('Day workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
   select(method, description, estimate, lower, upper) %>% 
   # pivot_longer(cols = estimate) %>% 
   ggplot(aes(x = estimate, y = method, xmin = lower, xmax = upper, color = description)) +
@@ -149,7 +149,7 @@ nb_models %>%
   geom_linerange() + 
   facet_grid(description~., scales = 'free_x') +
   labs(title = "Negative binomial estimates and 95% confidence interval",
-       subtitle = "Models fitted individually by edit distance method and cluster membership",
+       subtitle = "15 models fitted individually by edit distance method and cluster membership",
        x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none',
@@ -158,22 +158,6 @@ save_plot("Plots/negative_binomial_estimates", height = 5.5, width = 6.5)
 
 # these coefficients are interpreted as roughly a range of +1min to -3min per year depending on the cluster
 # e.g. log(300) - log(299) = 0.003 which equals to exp(0.003) - 1 = 0.003004505 or 0.3% increase annually
-
-clusters_df %>% 
-  left_join(demographics, by = "ID") %>% 
-  select(ID, contains("cluster"), age, sex, state, race, alone_minutes = TRTALONE, year, student = TESCHFT) %>% 
-  mutate(student = recode(student,
-                            '-1' = "No",
-                            '1' = 'Full time',
-                            '2' = 'Part time')) %>% 
-  pivot_longer(cols = contains('cluster'),
-               names_to = "method", values_to = "cluster") %>% 
-  mutate(method = sub(pattern = "*_.*", "", method)) %>% 
-  left_join(cluster_descriptions) %>% 
-  filter(alone_minutes != -1) %>% 
-  ggplot(aes(x = alone_minutes)) +
-  geom_density() +
-  facet_grid(description ~ method, scales = 'free_y')
 
 
 # check the agreement among the clustering methods ------------------------
@@ -191,7 +175,7 @@ clusters_df %>%
   scale_y_continuous(labels = scales::percent_format(accuracy = 1.0),
                      breaks = seq(0, 1, by = 0.1)) +
   labs(title = "Cluster agreement across methods",
-       subtitle = "1 = total agreement across the clustering methods",
+       subtitle = "1 = total agreement across edit distance methods",
        x = "Number of unique cluster memberships",
        y = "Percent of respondents")
 save_plot("Plots/cluster_agreement", height = 6)
@@ -213,8 +197,8 @@ clusters_df %>%
   geom_tile() +
   scale_y_discrete(labels = NULL) +
   labs(title = "Cluster agreement across methods by respondent",
-       subtitle = "Each row represents a respondent\nThe color represents the cluster they were assigned to under that clustering method",
-       x = 'Clustering method',
+       subtitle = "Each row represents a respondent\nThe color represents the cluster they were assigned to under that method",
+       x = 'Edit distance method',
        y = 'Respondents') +
   theme(legend.position = 'top')
 save_plot("Plots/cluster_overlap", height = 6, dpi = 600)
@@ -224,6 +208,7 @@ save_plot("Plots/cluster_overlap", height = 6, dpi = 600)
 
 # split the data by cluster into individual dataframes
 final_df %>% 
+  mutate(year = year - min(year)) %>% 
   pivot_longer(cols = contains('cluster'),
                names_to = "method", values_to = "cluster") %>% 
   # mutate(method = sub(pattern = "*_.*", "", method)) %>% 
@@ -238,9 +223,6 @@ final_df %>%
 
 # set which clustering method we're modeling
 method_df <- hamming_df %>% dplyr::select(-method)
-
-# scale the year variable
-method_df$year <- method_df$year - min(method_df$year)
 
 # there's an issue here with duplicate observations
 # alone_time is not continuous, its discrete
@@ -339,8 +321,41 @@ nb_mlm_models <- final_df %>%
   left_join(cluster_descriptions) %>%
   select(alone_minutes, year, method, cluster = description) %>% 
   group_by(method) %>% 
+  # distinct() %>% 
   nest() %>% 
-  mutate(model = map(data, function(df) lme4::glmer.nb(alone_minutes ~ year + (year | cluster), data = df, verbose = TRUE)))
+  mutate(model = map(data, function(df){
+    lme4::glmer.nb(alone_minutes ~ year + (year | cluster), 
+                   data = df, verbose = TRUE, 
+                   # initCtrl = list(theta = 1.122),
+                   control = glmerControl(optCtrl = list(maxfun = 1e5)))
+                   # control = glmerControl(optimizer = "Nelder_Mead",
+                   #                        optCtrl = list(maxfun = 1e6)))
+    # theta parameter pulled from first fitting model to the hamming group
+    # this fixes convergence errors for the other models
+  }))
+
+
+dat <- final_df %>% 
+  mutate(year = year - min(year)) %>% 
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>% 
+  mutate(method = sub(pattern = "*_.*", "", method),
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+  left_join(cluster_descriptions) %>%
+  select(alone_minutes, year, method, cluster = description) %>% 
+  filter(method == 'lcs')
+
+tmp_lcs  <- lme4::glmer.nb(alone_minutes ~ year + (year | cluster), data = dat, verbose = TRUE)  
+
+summary(tmp_lcs)
+anova(tmp_lcs)
+getME(tmp_lcs, 'theta')
+getME(tmp_lcs, 'lower')
+
+# restart
+ss <- getME(nb_mlm_models$model[[1]], c("theta","fixef"))
+m2 <- update(tmp_lcs, start = ss, control = glmerControl(optimizer = "Nelder_Mead", tolPwrss = 1e-8,
+                                                         optCtrl = list()))
 
 # calculate confidence interval and plot
 nb_mlm_models %>% 
@@ -365,7 +380,7 @@ nb_mlm_models %>%
   geom_linerange() + 
   facet_grid(description~., scales = 'free_x') +
   labs(title = "Negative binomial estimates and 95% confidence interval",
-       subtitle = "MLM models fitted individually by edit distance method ",
+       subtitle = "Four MLM models fitted individually by edit distance method ",
        x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none',
@@ -388,7 +403,6 @@ cluster_slope$slope <- cluster_slope$year + year_slope
 cluster_slope$cluster <- rownames(cluster_slope)
 
 # plot the slopes
-# TODO add some illustration of the variability of the BLUPS
 cluster_slope %>% 
   ggplot(aes(x = reorder(cluster, slope), y = slope, color = cluster)) +
   geom_point() +

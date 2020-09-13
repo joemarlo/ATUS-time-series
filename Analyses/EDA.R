@@ -22,8 +22,8 @@ demographics_df %>%
   pivot_longer(cols = c("Alone time excluding work", "All alone time")) %>% 
   ggplot(aes(x = year, y = value, color = name)) +
   geom_line() +
-  labs(title = "Time spent alone has been increasing steadily",
-       caption = "American Time Use Survey 2003-2018",
+  labs(title = "Time spent alone has been steadily increasing",
+       caption = "Data from American Time Use Survey 2003-2018",
        x = "Year",
        y = "Mean minutes per day")
 ggsave(filename = "Plots/mean_alone_time.png",

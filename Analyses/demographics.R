@@ -41,20 +41,20 @@ final_df <- clusters_df %>%
 
 # cluster descriptions based on proportion plots
 cluster_descriptions <- tribble(~method, ~cluster, ~description,
-                                'hamming', 1, '9-5 workers',
+                                'hamming', 1, 'Day workers',
                                 'hamming', 2, 'Night workers',
                                 'hamming', 3, 'Students',
                                 'hamming', 4, 'Uncategorized',
-                                'lcs', 1, '9-5 workers',
+                                'lcs', 1, 'Day workers',
                                 'lcs', 2, 'Students',
                                 'lcs', 3, 'Uncategorized',
-                                'lv', 1, '9-5 workers',
+                                'lv', 1, 'Day workers',
                                 'lv', 2, 'Night workers',
                                 'lv', 3, 'Students',
                                 'lv', 4, 'Uncategorized',
                                 'osa', 1, 'Students',
                                 'osa', 2, 'Uncategorized',
-                                'osa', 3, '9-5 workers',
+                                'osa', 3, 'Day workers',
                                 'osa', 4, 'Night workers')
 
 # distribution of alone time by cluster
@@ -70,6 +70,9 @@ clusters_df %>%
   mutate(method = sub(pattern = "*_.*", "", method)) %>% 
   left_join(cluster_descriptions) %>% 
   filter(alone_minutes != -1) %>% 
+  # group_by(method, description) %>% 
+  # summarize(mean = mean(alone_minutes),
+  #           var = var(alone_minutes)) %>% mutate(ratio = var / mean)
   ggplot(aes(x = alone_minutes, color = method, fill = method)) +
   geom_density(alpha = 0.3) +
   scale_x_continuous(labels = scales::comma_format()) +

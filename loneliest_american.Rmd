@@ -151,12 +151,12 @@ The final clusters were created using a weighted sample of 25,000 respondents fr
 Discuss silhouettes and dendrogram
 
 ```{r out.width="45%", fig.align='center', fig.cap="Silhouette distances",fig.show='hold'}
-# knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_silhouette.png", "Analyses/Levenshtein/Plots/Levenshtein_silhouette.png",
-#                           "Analyses/OSA/Plots/OSA_silhouette.png", "Analyses/LCS/Plots/LCS_silhouette.png"))
+knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_silhouette.png", "Analyses/Levenshtein/Plots/Levenshtein_silhouette.png",
+                          "Analyses/OSA/Plots/OSA_silhouette.png", "Analyses/LCS/Plots/LCS_silhouette.png"))
 ```
 ```{r out.width="45%", fig.align='center', fig.cap="Dendrograms",fig.show='hold'}
-# knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_dendrogram.png", "Analyses/Levenshtein/Plots/Levenshtein_dendrogram.png",
-#                           "Analyses/OSA/Plots/OSA_dendrogram.png", "Analyses/LCS/Plots/LCS_dendrogram.png"))
+knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_dendrogram.png", "Analyses/Levenshtein/Plots/Levenshtein_dendrogram.png",
+                          "Analyses/OSA/Plots/OSA_dendrogram.png", "Analyses/LCS/Plots/LCS_dendrogram.png"))
 ```
 
 
@@ -191,6 +191,12 @@ knitr::include_graphics(c("Plots/cluster_agreement.png", "Plots/cluster_overlap.
 # Modeling
 
 Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+```{r out.width="80%", fig.align='center', fig.cap="Densities of alone time by cluster",fig.show='hold'}
+knitr::include_graphics("Plots/alone_time_densities.png")
+```
+
+Over-dispersion is an issue. The mean daily alone minutes range from 202 to 400 per each cluster and the variances range from 19,724 to 81,265. This violates an assumption of Poisson models: mean equals variance. Negative binomial models do not require this assumption. 
+
 
 ## Multiple single level negative binomials
 
@@ -235,7 +241,7 @@ broom.mixed::glance(mlm_nb) %>%
 ```
 
 
-## Model interpretation
+## Model discussion
 
 ```{r out.width="80%", fig.align='center', fig.cap="Hamming edit distance: Multi-level negative binomial effects",fig.show='hold'}
 knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
@@ -266,9 +272,6 @@ Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis. Ultricies m
 
 # Appendix
 
-```{r out.width="80%", fig.align='center', fig.cap="Densities of alone time by cluster",fig.show='hold'}
-knitr::include_graphics("Plots/alone_time_densities.png")
-```
 
 ```{r}
 tribble(
