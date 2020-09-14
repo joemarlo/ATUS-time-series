@@ -124,8 +124,8 @@ nb_models <- final_df %>%
                names_to = "method", values_to = "cluster") %>% 
   group_by(method, cluster) %>% 
   nest() %>% 
-  mutate(model = map(data, function(df) MASS::glm.nb(alone_minutes ~ year, data = df)),
-         #model = map(data, function(df) glm(alone_minutes ~ year, data = df, family = 'poisson')),
+  mutate(#model = map(data, function(df) MASS::glm.nb(alone_minutes ~ year, data = df)),
+         model = map(data, function(df) glm(alone_minutes ~ year, data = df, family = quasipoisson(link = 'log'))),
          tidied = map(model, broom::tidy),
          confint = map(model, function(model){
            cf <- confint(model)
@@ -149,13 +149,13 @@ nb_models %>%
   geom_point() +
   geom_linerange() + 
   facet_grid(description~., scales = 'free_x') +
-  labs(title = "Negative binomial estimates and 95% confidence interval",
+  labs(title = "Quasi-poisson estimates and 95% confidence interval",
        subtitle = "15 models fitted individually by edit distance method and cluster membership",
        x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none',
         strip.text.y = element_text(size = 7))
-save_plot("Plots/negative_binomial_estimates", height = 5.5, width = 6.5)
+save_plot("Plots/qp_estimates", height = 5.5, width = 6.5)
 
 # these coefficients are interpreted as roughly a range of +1min to -3min per year depending on the cluster
 # e.g. log(300) - log(299) = 0.003 which equals to exp(0.003) - 1 = 0.003004505 or 0.3% increase annually
@@ -249,6 +249,7 @@ method_df <- hamming_df %>% dplyr::select(-method)
 
 # fit poisson and negative binomial
 summary(glm(alone_minutes ~ year + cluster, data = method_df, family = "poisson"))
+summary(glm(alone_minutes ~ year + cluster, data = method_df, family = quasipoisson(link = 'log')))
 summary(MASS::glm.nb(alone_minutes ~ year + cluster, data = method_df))
 
 # recode min minutes are difference over 2003 ???
@@ -281,6 +282,11 @@ mlm_nb <- lme4::glmer.nb(alone_minutes ~ year + (year | cluster), data = method_
 summary(mlm_nb)
 anova(mlm_nb)
 
+mlm_qp <- MASS::glmmPQL(fixed = alone_minutes ~ year, random = ~ year | cluster, 
+             data = method_df, family = quasipoisson(link = 'log'))
+summary(mlm_qp)
+
+
 broom.mixed::tidy(mlm_nb)
 # broom.mixed::augment(mlm_nb)
 broom.mixed::glance(mlm_nb)
@@ -301,12 +307,12 @@ coef(mlm_nb)$cluster %>%
   rownames_to_column() %>% 
   mutate(lower = year - (1.96 * standard_errors),
          upper = year + (1.96 * standard_errors)) %>% 
-  ggplot(aes(x = year, y = reorder(rowname, year), 
+  ggplot(aes(x = year, y = reorder(rowname, 4:1), 
              xmin = lower, xmax = upper, color = rowname)) +
   geom_point() +
   geom_linerange() +
   labs(title = "Negative binomial random effects and 95% confidence interval",
-       subtitle = "Multi-level model fitted on the Hamming clusters",
+       subtitle = "Multilevel model fitted on the Hamming clusters",
        x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none')
@@ -322,7 +328,7 @@ nb_mlm_models <- final_df %>%
   left_join(cluster_descriptions) %>%
   select(alone_minutes, year, method, cluster = description) %>% 
   group_by(method) %>% 
-  # distinct() %>% 
+  rownames_to_column('id') %>% # for overdispersion parameter
   nest() %>% 
   mutate(model = map(data, function(df){
     # lme4::glmer.nb(alone_minutes ~ year + (year | cluster), 
@@ -333,8 +339,12 @@ nb_mlm_models <- final_df %>%
                    #                        optCtrl = list(maxfun = 1e6)))
     # theta parameter pulled from first fitting model to the hamming group
     # this fixes convergence errors for the other models
-    lme4::glmer(alone_minutes ~ year + (year | cluster), data = df, family = "poisson")
     
+    # lme4::glmer(alone_minutes ~ year + (year | cluster), data = df, family = "poisson")
+    # lme4::glmer(alone_minutes ~ year + id + (year | cluster), data = df, family = 'poisson')
+    MASS::glmmPQL(fixed = alone_minutes ~ year, random = ~ year | cluster, 
+                  data = df, family = quasipoisson(link = 'log'))
+    # http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#overdispersion
   }))
 
 
@@ -364,31 +374,32 @@ nb_mlm_models <- final_df %>%
 nb_mlm_models %>% 
   mutate(tidied = map(model, function(model){
     # extract the standard error of the random errors
-    standard_errors <- arm::se.ranef(model)$cluster[,'year']       
+    # standard_errors <- arm::se.ranef(model)$cluster[,'year']       
     
     # calculate the confidence interval
-    coef(model)$cluster %>%
+    # coef(model)$cluster %>%
+    coef(model) %>% 
       as.data.frame() %>%
-      rownames_to_column() %>%
-      mutate(lower = year - (1.96 * standard_errors),
-             upper = year + (1.96 * standard_errors))
+      rownames_to_column()# %>%
+      # mutate(lower = year - (1.96 * standard_errors),
+      #        upper = year + (1.96 * standard_errors))
          })) %>% 
   unnest(tidied) %>% 
-  select(method, description = rowname, estimate = year, lower, upper) %>% 
+  select(method, description = rowname, estimate = year) %>% #, lower, upper) %>% 
   ungroup() %>% 
   mutate(description = factor(description, 
                               levels = c('Day workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
-  ggplot(aes(x = estimate, y = method, xmin = lower, xmax = upper, color = description)) +
+  ggplot(aes(x = estimate, y = method, color = description)) + #, xmin = lower, xmax = upper)) +
   geom_point() +
-  geom_linerange() + 
+  # geom_linerange() + 
   facet_grid(description~., scales = 'free_x') +
-  labs(title = "Negative binomial estimates and 95% confidence interval",
+  labs(title = "Quasi-poisson estimates", # and 95% confidence interval",
        subtitle = "Four MLM models fitted individually by edit distance method ",
        x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none',
         strip.text.y = element_text(size = 7))
-save_plot("Plots/negbin_mlm_effects_all_methods", height = 5.5, width = 6.5)
+save_plot("Plots/qp_mlm_effects_all_methods", height = 5.5, width = 6.5)
 
 
 #  plot the results: old method -------------------------------------------

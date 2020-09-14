@@ -2,7 +2,7 @@
 title: "Who are the loneliest Americans?"
 author: "Joe Marlo"
 date: "`r Sys.Date()`"
-subtitle: "Working paper"
+subtitle: "Draft"
 abstract: |
   Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Arcu dictum varius duis at consectetur lorem donec massa. Vestibulum lectus mauris ultrices eros in cursus turpis massa tincidunt. Dui accumsan sit amet nulla. At tellus at urna condimentum mattis pellentesque id nibh tortor. Interdum velit euismod in pellentesque massa placerat. Massa sed elementum tempus egestas. Turpis egestas integer eget aliquet nibh. Cursus eget nunc scelerisque viverra mauris in aliquam sem. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
 output:
@@ -61,9 +61,9 @@ It’s intuitive that this increase may not be evenly distributed across the pop
 
 ## Alone time definition
 
-The American Time Use Survey tracks alone time via a computation of other collected variables. For each activity — except those noted below — the BLS tracks the number of participants present during the activity. Alone time is tallied only during activities for which only the primary respondent is present.
+The American Time Use Survey tracks alone time via a computation of other collected variables. For each activity — except those noted below — the BLS tracks the number of participants present during the activity. Alone time is tallied only during activities for which only the primary respondent is physically present.
 
-Activities that are excluded from the tally include: 
+The benefit of this approach is detailed data on the length of time and description of the activity in which the person is alone. The shortcomings of this is approach is that it only pertains to physicality. Therefore activities such as phone or video calls will be labeled as 'alone.' Additionally, a few activities are specifically excluded from the tally including: 
 
 - Working  
 - Sleeping  
@@ -71,10 +71,15 @@ Activities that are excluded from the tally include:
 - Personal/private activities  
 - Any time in which the respondent refused to provide activity detail
 
+The question posed to respondents to define who was present:
+> "Who was in the room with you / Who accompanied you"
+
 The BLS also includes another variable, `TRTALONE_WK` which is similar to `TRTALONE` but includes alone time during work activities. This is excluded for the analysis as it is only available 2010-2018.
 
+<!-- verified physicality by looking at phone calls. 70% of phone calls have no one else present -->
 
-# Literature review
+
+# Literature on loneliness
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
@@ -84,25 +89,23 @@ Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui fa
 
 Arcu dictum varius duis at consectetur lorem donec massa. Vestibulum lectus mauris ultrices eros in cursus turpis massa tincidunt. Dui accumsan sit amet nulla. At tellus at urna condimentum mattis pellentesque id nibh tortor. Interdum velit euismod in pellentesque massa placerat. Massa sed elementum tempus egestas. Turpis egestas integer eget aliquet nibh. Cursus eget nunc scelerisque viverra mauris in aliquam sem.
 
+A PLAGUE OF LONELINESS: Americans were already lonely. Then COVID-19 hit. By: DUCHARME, JAMIE, Time International (South Pacific Edition), 08180628, 6/22/2020, Vol. 195, Issue 23/24
+
 
 # Methodology
 
-Clustering methods will be used to determine similar sequences of how individuals spend their day. Primary techniques will be using string editing techniques ([Abbot](https://www.jstor.org/stable/2780695)) and secondary techniques include model based clustering…
+Clustering methods will be used to determine similar sequences of how individuals spend their day. Primary techniques will be using string editing techniques ([Abbot](https://www.jstor.org/stable/2780695)) and secondary techniques are model-based clustering…
 
 String editing techniques will start by aggregating the different types of activities from 465 specific activities into 15 activities based on their hierarchical definitions provided by the BLS. These 15 activities will then be recoded as single character strings representing how an individual spends each 30 minute period of their day. Their full day’s activity is represented by the resulting 48 character string.
 
+...model based...
+
+
 ## Data detail
 
-Data comes from The American Time Use which surveys how Americans spend their time. The diary (`atusact` file) and CPS (`atuscps_0318` file) data will be used from the 2003-2018 Multi-Year Interview dataset.
+Data comes from The American Time Use which surveys how Americans spend their time. The diary (`atusact_0318` file) and CPS (`atuscps_0318` file) data are used from the 2003-2018 Multi-Year Interview dataset. The data details each minute of the respondent's day by mapping it to a list of 465 activities. The author then aggregated these 465 activities into 15 activities based on the Bureau of Labor Statistics' (BLS) hierarchical definitions and the author's judgment. See Appendix Table 3 for the aggregation mapping. Additionally, to reduce computation load, each respondents' day was summarized into 48 thirty-minute windows representing the modal activity during the window.  
 
-2003-2018 data
-TULINENO == 1
-weekdays only
-The ATUS Activity file was used `atusact_0318`
-data is collected at the minute level started at 4am-4am
-To reduce computation load, each respondents' day was summarized into 48 thirty-minute windows representing the model activity during the window.
-
-Activities are 
+Time use varies greatly between week and weekend days so only weekdays are included in the analysis. Similarly, holidays are excluded.
 
 
 # Distance measures
@@ -118,10 +121,12 @@ The distance between the respondents string sequences can be calculated using a 
 
 Each of these have advantages and disadvantages that will be explored along with their impact on the final clustering.
 
+...expand on implications of each distance measure...
+
 
 # Clustering
 
-Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+Discuss clustering methods. Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
 
 ## Efficacy of cross-sectional clustering
 
@@ -144,12 +149,16 @@ knitr::include_graphics(c("Analyses/Pre-post-comparison/Levenshtein 2003-2010_pr
                           "Analyses/Pre-post-comparison/Levenshtein 2011-2018_proportion_plots.png"))
 ```
 
+
 ## Final clusters
 
 The final clusters were created using a weighted sample of 25,000 respondents from the 2003-2018 surveys. 
 
-Discuss silhouettes and dendrogram
+Discuss silhouettes and dendrogram. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
 
+Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit.  Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. 
+
+ 
 ```{r out.width="45%", fig.align='center', fig.cap="Silhouette distances",fig.show='hold'}
 knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_silhouette.png", "Analyses/Levenshtein/Plots/Levenshtein_silhouette.png",
                           "Analyses/OSA/Plots/OSA_silhouette.png", "Analyses/LCS/Plots/LCS_silhouette.png"))
@@ -160,7 +169,8 @@ knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_dendrogram.png", "Anal
 ```
 
 
-Discuss sequence plots and patterns
+Discuss sequence plots and patterns. Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
+
 
 ```{r out.width="45%", fig.align='center', fig.cap="Sequence plots",fig.show='hold'}
 knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_sequence_plots.png", "Analyses/Levenshtein/Plots/Levenshtein_sequence_plots.png",
@@ -174,7 +184,8 @@ knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_proportion_plots.png",
 
 ## Categorization of clusters
 
-Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis. Ultricies mi quis hendrerit dolor magna eget est. Pharetra diam sit amet nisl suscipit adipiscing. Donec pretium vulputate sapien nec. Arcu odio ut sem nulla pharetra. Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi.
+The sequence and proportion plots illustrate the contents of each cluster are mostly consistent across the edit distance methods with the exception of LCS. Each cluster can therefore be identified across methods using their common characteristics: one cluster consisting of mostly daytime work will now be labeled as "Day workers", a second cluster of mostly evening and night work "Night workers", a third of dominated by education "Students", and then the fourth contains a mixture of activities with no dominate characteristics so this will be referred to as "Uncategorized." 
+
 
 ## Distance measure comparison
 
@@ -182,7 +193,7 @@ Visual inspections of the sequence and proportion plots appear to show consisten
 
 The pattern is clearer examined on a respondent-level basis. The right plot in Figure # shows the cluster assignment per respondent per method. Homogenous colors horizontally indicate full agreement across the edit distance measures. 
 
-```{r out.width="45%", fig.align='center', fig.cap="caption",fig.show='hold'}
+```{r out.width="45%", fig.align='center', fig.cap="Cluster agreement across methods",fig.show='hold'}
 knitr::include_graphics(c("Plots/cluster_agreement.png", "Plots/cluster_overlap.png"))
 ```
 
@@ -190,27 +201,65 @@ knitr::include_graphics(c("Plots/cluster_agreement.png", "Plots/cluster_overlap.
 
 # Modeling
 
-Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+This is an exercise in comparing the implications of the edit distance methods. Each edit distance method will be modeled seperately, however the goal is also to understand how alone time has varied across different groups (i.e. clusters). Therefore, the unit of interest is the slope of alone time.
+
+Single-level and multilevel models are both appropriate. Multilevel models "account for individual- and group-level variation in estimating group-level regression coefficients" and "estimate regression coefficients for particular groups" (Gelman Hill 2006). However, the clustering methods are signaling only four clusters are optimal. Gelman and Hill also note that "when the number of groups is small (less than five, say), there is typically not enough information to accurately estimate group-level variation. As a result, multilevel models in this setting typically gain little beyond classical varying-coefficient models." 
+
+<!-- what is a varying-coefficient model? -->
+
+<!--
+Benefit of multilevel
+
+From Gelman Hill 2006:
+
+"
+There are various reasons why it might be worth moving to a multilevel model, whether for purposes of causal inference, the study of variation, or prediction of future outcomes:  
+
+- Accounting for individual- and group-level variation in estimating group-level regression coefficients. For example, in the child support study in Section 11.2, interest lies in a city-level predictor (child support enforcement), and in classical regression it is not possible to include city indicators along with city-level predictors.
+- Modeling variation among individual-level regression coefficients. In classical re- gression, one can do this using indicator variables, but multilevel modeling is convenient when we want to model the variation of these coefficients across groups, make predictions for new groups, or account for group-level variation in the uncertainty for individual-level coefficients.
+- Estimating regression coefficients for particular groups. For example, in the next chapter, we discuss the problem of estimating radon levels from measurements in several counties in Minnesota. With a multilevel model, we can get reasonable estimates even for counties with small sample sizes, which would be difficult using classical regression.
+"
+
+"
+When there is very little group-level variation, the multilevel model reduces to classical regression with no group indicators; conversely, when group-level coefficients vary greatly (compared to their standard errors of estimation), multilevel modeling reduces to classical regression with group indicators.
+When the number of groups is small (less than five, say), there is typically not enough information to accurately estimate group-level variation. As a result, multi- level models in this setting typically gain little beyond classical varying-coefficient models.
+"
+-->
+
+As such, the approach is to fit both single- and multilevel models and draw comparisons. This is additive to comparing the edit distance methods so there will be 19 total models fit: 15 single-level models for each combination of edit distance and cluster membership (no pooling) plus four multilevel models for each edit distance method.
+
+
+## Count data and overdispersion
+
+Describe data. egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
+
+
 ```{r out.width="80%", fig.align='center', fig.cap="Densities of alone time by cluster",fig.show='hold'}
 knitr::include_graphics("Plots/alone_time_densities.png")
 ```
 
-Over-dispersion is an issue. The mean daily alone minutes range from 202 to 400 per each cluster and the variances range from 19,724 to 81,265. This violates an assumption of Poisson models: mean equals variance. Negative binomial models do not require this assumption. 
+Overdispersion is an issue. The mean daily alone minutes range from 202 to 400 per each cluster and the variances range from 19,724 to 81,265. This violates an assumption of Poisson models: mean equals variance. Negative binomial models do not require this assumption. 
+
+Check if the deviance residuals < n-p  
+for poisson, should also increase the standard errors by sqrt()
 
 
-## Multiple single level negative binomials
+## Multiple single-level negative binomials
 
 ```{r out.width="75%", fig.align='center', fig.cap="Negative binomial estimates",fig.show='hold'}
-knitr::include_graphics("Plots/negative_binomial_estimates.png")
+# knitr::include_graphics("Plots/negative_binomial_estimates.png")
 ```
 
+```{r out.width="75%", fig.align='center', fig.cap="Quasi-poisson estimates",fig.show='hold'}
+knitr::include_graphics("Plots/qp_estimates.png")
+```
 
-## Multi-level negative binomial
+## Multilevel negative binomial
 
-Cluster as random intercept and Year as fixed and random slope
 
-Benefit of multi-level
+Cluster as varying intercept and Year as fixed and random slope
 
+varying intercepts and varying slope which themselves vary by cluster
 
 
 Model equation
@@ -224,33 +273,41 @@ The model form in R syntax:
 
 ## Model fit
 
-Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
-
+Describe diagnostics, residuals, etc. Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
 
 
 ```{r}
-broom.mixed::tidy(mlm_nb) %>% 
+broom.mixed::tidy(mlm_qp) %>% 
   .[, 1:6] %>% 
   pander::pander(justify = 'lllrrr',
                  digits = 4,
                  round = 4,
-                 caption = 'Multi-level negative binomial model diagnostics')
-broom.mixed::glance(mlm_nb) %>% 
-  pander::pander(justify = 'rrrrrr',
-                 caption = 'Multi-level negative binomial model diagnostics')
+                 caption = 'Multilevel quasi-poisson model diagnostics')
+# broom.mixed::glance(mlm_qp) %>% 
+#   pander::pander(justify = 'rrrrrr',
+#                  caption = 'Multilevel quasi-poisson model diagnostics')
 ```
 
 
 ## Model discussion
 
-```{r out.width="80%", fig.align='center', fig.cap="Hamming edit distance: Multi-level negative binomial effects",fig.show='hold'}
+Discuss issues. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Discuss interpretation of effects. dio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur.
+
+
+```{r out.width="80%", fig.align='center', fig.cap="Hamming edit distance: Multilevel negative binomial effects",fig.show='hold'}
 knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
 ```
 
-There's an issue here with singularities
+<!-- There's an issue here with singularities -->
 
-```{r out.width="80%", fig.align='center', fig.cap="All edit distance measures: Multi-level negative binomial effects",fig.show='hold'}
-knitr::include_graphics("Plots/negbin_mlm_effects_all_methods.png")
+```{r out.width="80%", fig.align='center', fig.cap="All edit distance measures: Multilevel negative binomial effects",fig.show='hold'}
+# knitr::include_graphics("Plots/negbin_mlm_effects_all_methods.png")
+```
+
+```{r out.width="80%", fig.align='center', fig.cap="All edit distance measures: Multilevel quasi-poisson estimates",fig.show='hold'}
+knitr::include_graphics("Plots/qp_mlm_effects_all_methods.png")
 ```
 
 

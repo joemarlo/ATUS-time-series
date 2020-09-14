@@ -23,7 +23,7 @@ n_sample <- nrow(atus_string_samp)
 # distance ----------------------------------------------------------------
 
 # compute the string distances
-distance_method <- "lcs" # "lv" "hamming" "osa" "lcs"
+distance_method <- "osa" # "lv" "hamming" "osa" "lcs"
 distance_method_pretty <- case_when(distance_method == 'hamming' ~ "Hamming",
                                     distance_method == 'osa' ~ "OSA",
                                     distance_method == 'lcs' ~ 'LCS',
@@ -64,6 +64,7 @@ hclust_sw$All.index %>%
   geom_area(alpha = 0.4) +
   geom_point(color = 'grey30') +
   scale_x_continuous(breaks = 2:20) +
+  scale_y_continuous(limits = c(0, 0.3)) +
   labs(title = paste0(distance_method_pretty, " edit distance silhouette width"),
        subtitle = paste0("Weighted sample of ", 
                          scales::comma_format()(n_sample),
@@ -71,10 +72,6 @@ hclust_sw$All.index %>%
        x = 'n clusters',
        y = 'Silhouette width')
 save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_silhouette"))
-# ggsave(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_silhouette.svg"),
-#        device = "svg",
-#        height = 5,
-#        width = 7)
 
 
 # re-cluster using a larger sample ----------------------------------------
@@ -176,20 +173,20 @@ text_labels <- tribble(
 )
 
 # LCS
-text_labels <- tribble(
-  ~label, ~x, ~y,
-  'Cluster 1', 4500, -90,
-  'Cluster 2', 13250, -90,
-  'Cluster 3', 19000, -90
-)
+# text_labels <- tribble(
+#   ~label, ~x, ~y,
+#   'Cluster 1', 4500, -90,
+#   'Cluster 2', 13250, -90,
+#   'Cluster 3', 19000, -90
+# )
 
 # plot the dendrogram
 ggplot(ggd1$segments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = ggd1$segments$col,
                linetype = ggd1$segments$linetype, lwd = 0.6, alpha = 0.7) +
   geom_text(data = text_labels, aes(label = label, x = x, y = y), family = 'Helvetica') +
-  # coord_cartesian(ylim = c(100, 2500), clip = 'off') +
-  coord_cartesian(ylim = c(100, 4500), clip = 'off') +
+  coord_cartesian(ylim = c(100, 2500), clip = 'off') +
+  # coord_cartesian(ylim = c(100, 4500), clip = 'off') +
   scale_x_continuous(labels = NULL) +
   scale_y_continuous(labels = NULL) +
   labs(title =paste0(distance_method_pretty, ' edit distance with Ward (D2) linkage'),

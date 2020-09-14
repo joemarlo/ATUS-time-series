@@ -78,6 +78,7 @@ hclust_sw$All.index %>%
   geom_area(alpha = 0.4) +
   geom_point(color = 'grey30') +
   scale_x_continuous(breaks = 2:20) +
+  scale_y_continuous(limits = c(0, 0.25)) +
   labs(title = paste0(distance_method_pretty, " edit distance silhouette width"),
        subtitle = paste0("Weighted sample of ", 
                          scales::comma_format()(n_sample),
