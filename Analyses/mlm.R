@@ -177,7 +177,7 @@ clusters_df %>%
                      breaks = seq(0, 1, by = 0.1)) +
   labs(title = "Cluster agreement across methods",
        subtitle = "1 = total agreement across edit distance methods",
-       x = "Number of unique cluster memberships",
+       x = "Count of unique cluster memberships",
        y = "Percent of respondents")
 save_plot("Plots/cluster_agreement", height = 6)
   
@@ -281,17 +281,47 @@ anova(mlm_linear)
 mlm_nb <- lme4::glmer.nb(alone_minutes ~ year + (year | cluster), data = method_df, verbose = TRUE)
 summary(mlm_nb)
 anova(mlm_nb)
-
-mlm_qp <- MASS::glmmPQL(fixed = alone_minutes ~ year, random = ~ year | cluster, 
-             data = method_df, family = quasipoisson(link = 'log'))
-summary(mlm_qp)
-
+plot(mlm_nb)
 
 broom.mixed::tidy(mlm_nb)
 # broom.mixed::augment(mlm_nb)
 broom.mixed::glance(mlm_nb)
 coef(mlm_nb)
 
+mlm_pois <- glmer(alone_minutes ~ year + (year | cluster), 
+             data = method_df, family=poisson(link="log"))
+performance::check_overdispersion(mlm_pois)
+
+# gelman hill 2006 pg115
+y <- method_df$alone_minutes
+n <- nrow(method_df) 
+k <- 1
+yhat <- predict(mlm_pois, type = "response")
+z <- (y - yhat) / sqrt(yhat)
+cat ("overdispersion ratio is ", sum(z^2) / (n - k), "\n")
+cat ("p-value of overdispersion test is ", pchisq (sum(z^2), n - k), "\n")
+
+# fit quasi poisson -------------------------------------------------------
+
+mlm_qp <- MASS::glmmPQL(fixed = alone_minutes ~ year, random = ~ year | cluster, 
+                        data = method_df, family = quasipoisson(link = 'log'))
+summary(mlm_qp)
+broom.mixed::tidy(mlm_qp)
+broom.mixed::augment(mlm_qp)
+broom.mixed::glance(mlm_qp)
+coef(mlm_qp)
+
+lme4::ranef(mlm_qp, condVar=T)
+nlme::intervals(mlm_qp)
+plot(ranef(mlm_qp))
+plot(mlm_qp)
+plot(density(residuals(mlm_qp)))
+qqnorm(residuals(mlm_qp))
+qqline(residuals(mlm_qp))
+qqnorm(ranef(mlm_qp)[, 1])
+qqline(ranef(mlm_qp)[, 1])
+qqnorm(ranef(mlm_qp)[, 2])
+qqline(ranef(mlm_qp)[, 2])
 
 # ploting random effects --------------------------------------------------
 
@@ -302,7 +332,7 @@ coef(mlm_nb)
 standard_errors <- arm::se.ranef(mlm_nb)$cluster[,'year']
 
 # plot the BLUPs and their SE
-coef(mlm_nb)$cluster %>% 
+coef(mlm_nb)$cluster %>%  
   as.data.frame() %>% 
   rownames_to_column() %>% 
   mutate(lower = year - (1.96 * standard_errors),
@@ -311,15 +341,17 @@ coef(mlm_nb)$cluster %>%
              xmin = lower, xmax = upper, color = rowname)) +
   geom_point() +
   geom_linerange() +
-  labs(title = "Negative binomial random effects and 95% confidence interval",
+  scale_x_continuous(limits = c(-0.025, 0.015)) +
+  scale_y_discrete(position = "right") +
+  labs(title = "Negative binomial estimates and 95% confidence interval",
        subtitle = "Multilevel model fitted on the Hamming clusters",
        x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none')
-save_plot("Plots/hamming_negbin_mlm_effects", height = 4, width = 7.2)
+save_plot("Plots/hamming_negbin_mlm_effects", height = 4, width = 6.5)
 
 # repeat for all clustering methods
-nb_mlm_models <- final_df %>% 
+mlm_models <- final_df %>% 
   mutate(year = year - min(year)) %>% 
   pivot_longer(cols = contains('cluster'),
                names_to = "method", values_to = "cluster") %>% 
@@ -342,7 +374,7 @@ nb_mlm_models <- final_df %>%
     
     # lme4::glmer(alone_minutes ~ year + (year | cluster), data = df, family = "poisson")
     # lme4::glmer(alone_minutes ~ year + id + (year | cluster), data = df, family = 'poisson')
-    MASS::glmmPQL(fixed = alone_minutes ~ year, random = ~ year | cluster, 
+    MASS::glmmPQL(fixed = alone_minutes ~ year, random = ~ year | cluster,
                   data = df, family = quasipoisson(link = 'log'))
     # http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#overdispersion
   }))
@@ -371,7 +403,7 @@ nb_mlm_models <- final_df %>%
 #                                                          optCtrl = list()))
 
 # calculate confidence interval and plot
-nb_mlm_models %>% 
+mlm_models %>% 
   mutate(tidied = map(model, function(model){
     # extract the standard error of the random errors
     # standard_errors <- arm::se.ranef(model)$cluster[,'year']       
@@ -392,8 +424,9 @@ nb_mlm_models %>%
   ggplot(aes(x = estimate, y = method, color = description)) + #, xmin = lower, xmax = upper)) +
   geom_point() +
   # geom_linerange() + 
+  scale_x_continuous(limits = c(-0.025, 0.015)) +
   facet_grid(description~., scales = 'free_x') +
-  labs(title = "Quasi-poisson estimates", # and 95% confidence interval",
+  labs(title = "Quasi-Poisson estimates", # and 95% confidence interval",
        subtitle = "Four MLM models fitted individually by edit distance method ",
        x = "\nAnnual change in time spent alone",
        y = NULL) +

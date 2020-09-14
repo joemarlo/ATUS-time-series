@@ -51,12 +51,51 @@ knitr::include_graphics("Plots/mean_alone_time.png")
 ```
 
 
-It’s intuitive that this increase may not be evenly distributed across the population. Rather than subdividing the population by demographics, the population can be divided using sequence analysis and unsupervised learning techniques to find clusters of similar time-use patterns. These in turn may represent distinct demographic groups (e.g. a cluster with large amounts of time spent on education consists mostly of sub 25 year olds) but are not direct measurements of demographics. The clustering methodology allows demarcation of groups based on their activity and may capture groups such as students, workers, and the elderly.
+It’s intuitive that this increase may not be evenly distributed across the population. Rather than subdividing the population by demographics, the population can be divided using sequence analysis and unsupervised learning techniques to find clusters of similar time-use patterns. These in turn may represent distinct demographic groups (e.g. a cluster with large amounts of time spent on education consists mostly of sub 25 year olds) but are not direct measurements of demographics. This clustering methodology allows demarcation of groups based on their activity and may capture groups such as students, workers, and the elderly.
 
 
 ## Research question
 
 >Are increases in time spent alone equally affecting different subpopulations of Americans?
+
+
+# Literature 
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
+
+Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+
+Arcu dictum varius duis at consectetur lorem donec massa. Vestibulum lectus mauris ultrices eros in cursus turpis massa tincidunt. Dui accumsan sit amet nulla. At tellus at urna condimentum mattis pellentesque id nibh tortor. Interdum velit euismod in pellentesque massa placerat. Massa sed elementum tempus egestas. Turpis egestas integer eget aliquet nibh. Cursus eget nunc scelerisque viverra mauris in aliquam sem.
+
+
+Defining loneliness:
+- https://www.researchgate.net/profile/Daniel_Russell4/publication/271766646_The_measurement_of_loneliness/links/56bbc30408ae7be8798be595.pdf  
+- "some suggest the evidence of social decline is based on flawed indicators " https://doi.apa.org/doiLanding?doi=10.1037%2F1040-3590.7.3.286  
+
+Trends:
+- loneliness over time meta-analysis https://journals.sagepub.com/doi/full/10.1177/0146167214557007?casa_token=qprWkQrW1p4AAAAA%3AtWSkTxcYjZJPx_4y5vtcKLKV6kJQQbOQ4lHz9T_7UKYya5_QN1cD12cxv6Z_JHL7fcf-sG1vrfor  
+- "research that demonstrates declining social engagement; in comparison with decades past, people are less likely to join clubs, have fewer confidants, and are less likely to perceive others as trustworthy " https://journals.sagepub.com/doi/10.1177/000312240607100301  
+- "Social engagement through the internet, however, could be replacing traditional forms of sociability" https://journals.sagepub.com/doi/10.1177/1948550612469233  
+- https://books.google.com/books?hl=en&lr=&id=ySBrAAAAMAAJ&oi=fnd&pg=PA13&dq=loneliness+american&ots=dldWStCMS6&sig=NJGTmhoDtg7uXdLMX7pTA3oCgIc#v=onepage&q=loneliness%20american&f=false  
+
+Elderly:
+- "whether loneliness increases in old age, and if so, whether it relates to ageing itself, to time trends or to cohort effects and ... " https://academic.oup.com/ageing/article/28/5/491/36243  
+- "loneliness explained the excess risk of depression in the widowed." https://onlinelibrary.wiley.com/doi/abs/10.1002/gps.2181?casa_token=0ym35WpAkZ0AAAAA%3ABdmKXAZTQ6C5xKe538Jvr9PPypZem0_zhZYvgOz7W6fKbK2Cklqw_Xslq8sQk5xF7sPCRAqyeVu35w  
+- health outcomes https://journals.sagepub.com/doi/abs/10.1177/0898264305280993?casa_token=HF41nPUAZqUAAAAA:8zg6wBtozRz52BPPv6m-pkxQ1QlGCDJfxjmY_Uw63p9C7AsQDPT6C0MpFGcpasSnqqGgv4FRsBIo  
+- https://journals.sagepub.com/doi/pdf/10.1177/0164027587094001  
+- causal https://academic.oup.com/geronj/article-abstract/40/4/487/593670  
+
+Pop:
+- https://www.theatlantic.com/magazine/archive/2012/05/is-facebook-making-us-lonely/308930/  
+- https://www.nytimes.com/2006/07/02/weekinreview/02fountain.html  
+- A PLAGUE OF LONELINESS: Americans were already lonely. Then COVID-19 hit. By: DUCHARME, JAMIE, Time International (South Pacific Edition), 08180628, 6/22/2020, Vol. 195, Issue 23/24  
+
+Methods
+- Abbot: https://www.jstor.org/stable/2780695  
+- https://www.sciencedirect.com/science/article/pii/S0965856416303470
+
 
 
 ## Alone time definition
@@ -77,19 +116,6 @@ The question posed to respondents to define who was present:
 The BLS also includes another variable, `TRTALONE_WK` which is similar to `TRTALONE` but includes alone time during work activities. This is excluded for the analysis as it is only available 2010-2018.
 
 <!-- verified physicality by looking at phone calls. 70% of phone calls have no one else present -->
-
-
-# Literature on loneliness
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
-
-Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
-
-Arcu dictum varius duis at consectetur lorem donec massa. Vestibulum lectus mauris ultrices eros in cursus turpis massa tincidunt. Dui accumsan sit amet nulla. At tellus at urna condimentum mattis pellentesque id nibh tortor. Interdum velit euismod in pellentesque massa placerat. Massa sed elementum tempus egestas. Turpis egestas integer eget aliquet nibh. Cursus eget nunc scelerisque viverra mauris in aliquam sem.
-
-A PLAGUE OF LONELINESS: Americans were already lonely. Then COVID-19 hit. By: DUCHARME, JAMIE, Time International (South Pacific Edition), 08180628, 6/22/2020, Vol. 195, Issue 23/24
 
 
 # Methodology
@@ -171,6 +197,8 @@ knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_dendrogram.png", "Anal
 
 Discuss sequence plots and patterns. Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
 
+- LCS materially different: making no distinct between daytime and nighttime workers
+
 
 ```{r out.width="45%", fig.align='center', fig.cap="Sequence plots",fig.show='hold'}
 knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_sequence_plots.png", "Analyses/Levenshtein/Plots/Levenshtein_sequence_plots.png",
@@ -184,7 +212,7 @@ knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_proportion_plots.png",
 
 ## Categorization of clusters
 
-The sequence and proportion plots illustrate the contents of each cluster are mostly consistent across the edit distance methods with the exception of LCS. Each cluster can therefore be identified across methods using their common characteristics: one cluster consisting of mostly daytime work will now be labeled as "Day workers", a second cluster of mostly evening and night work "Night workers", a third of dominated by education "Students", and then the fourth contains a mixture of activities with no dominate characteristics so this will be referred to as "Uncategorized." 
+The sequence and proportion plots illustrate the contents of each cluster are mostly consistent across the edit distance methods with the exception of LCS. Each cluster can therefore be identified across methods using their common characteristics: one cluster consisting of mostly daytime work will now be labeled as "Day workers", a second cluster of mostly evening and night work "Night workers", a third dominated by education "Students", and then the fourth contains a mixture of activities with no dominate characteristics so this will be referred to as "Uncategorized." 
 
 
 ## Distance measure comparison
@@ -226,35 +254,78 @@ When the number of groups is small (less than five, say), there is typically not
 "
 -->
 
-As such, the approach is to fit both single- and multilevel models and draw comparisons. This is additive to comparing the edit distance methods so there will be 19 total models fit: 15 single-level models for each combination of edit distance and cluster membership (no pooling) plus four multilevel models for each edit distance method.
+As such, the approach is to fit both single- and multilevel models and draw comparisons. This is multiplicative to comparing the edit distance methods so there will be 19 total models fit: 15 single-level models for each combination of edit distance and cluster membership (no pooling) plus four multilevel models, one for each edit distance method.
 
 
 ## Count data and overdispersion
 
 Describe data. egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
 
+Not zero inflated. Only 4% of observations are zero
 
 ```{r out.width="80%", fig.align='center', fig.cap="Densities of alone time by cluster",fig.show='hold'}
 knitr::include_graphics("Plots/alone_time_densities.png")
 ```
 
-Overdispersion is an issue. The mean daily alone minutes range from 202 to 400 per each cluster and the variances range from 19,724 to 81,265. This violates an assumption of Poisson models: mean equals variance. Negative binomial models do not require this assumption. 
+Overdispersion is an issue. The mean daily alone minutes range from 202 to 400 per each cluster and the variances range from 19,724 to 81,265. This violates an assumption of Poisson models: mean equals variance. 
 
-Check if the deviance residuals < n-p  
-for poisson, should also increase the standard errors by sqrt()
+Dispersion can also be defined as estimated dispersion via Gelman and Hill (2006, pg 114):
 
+\begin{align*}
+dispersion\: ratio &= \frac{1}{n - k}\sum_{i = 1}^{n}z_i^2 \\
+n &= \#\: of\: data\: points  \\
+k &= \#\: of\: predictors  \\
+z &= standardized\: residuals = \frac{y_i - y^i}{sd(y^i)}
+\end{align*}
 
-## Multiple single-level negative binomials
+Fitting a Poisson multilevel model to this data results in a dispersion ratio of 151.2 — far larger than 1 — indicating a quasi-Poisson or negative binomial model is neccessary.
+
+<!-- https://easystats.github.io/performance/reference/check_overdispersion.html -->
+
+## Multiple single-level quasi-Poissons
+
+15 single-level quasi-Poissons models are fit to the data individually to estimate the effect of `Year` on per cluster per distance method. The models are fit stipulating the mean-variance relationship is $\sigma^2 = \delta\mu$.
+
+Model equation:
+\noindent\begin{minipage}[t]{.45\linewidth}
+\begin{align*}
+log(\lambda) &= \alpha + B_1X_1 \\
+\\
+&and \\
+\\
+\sigma^2 &= \delta\mu \\ \\
+\end{align*}
+\end{minipage}
+\begin{minipage}[t]{.45\linewidth}
+\begin{align*}
+\lambda &= mean\: count \\
+X_1 &= alone\: time \\
+\sigma^2 &= variance \\
+\delta &= dispersion\: parameter \\
+\mu &= mean \\
+\end{align*}
+\end{minipage}
+
+<!-- https://stats.stackexchange.com/questions/166506/how-to-express-a-poisson-regression-equation-as-a-quasi-poisson -->
+
+The model form in R syntax is simply:  
+\begin{center}
+\texttt{Alone time $\sim$ year}
+\end{center}
+
+Briefly discuss model fit. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+
+The coefficient for year is the difference in log counts. This can be also interpreted as the percentage increase in alone minutes per year. The only cluster to consistently and significantly differ from zero is the "Students" cluster. These point estimates range from -0.010 to -0.015, meaning the mean amount of alone time for students decreased at a rate of 1.0 to 1.5% per year from 2003 to 2018.  
 
 ```{r out.width="75%", fig.align='center', fig.cap="Negative binomial estimates",fig.show='hold'}
 # knitr::include_graphics("Plots/negative_binomial_estimates.png")
 ```
 
-```{r out.width="75%", fig.align='center', fig.cap="Quasi-poisson estimates",fig.show='hold'}
+```{r out.width="75%", fig.align='center', fig.cap="Quasi-Poisson estimates",fig.show='hold'}
 knitr::include_graphics("Plots/qp_estimates.png")
 ```
 
-## Multilevel negative binomial
+## Multilevel quasi-Poissons
 
 
 Cluster as varying intercept and Year as fixed and random slope
@@ -282,7 +353,7 @@ broom.mixed::tidy(mlm_qp) %>%
   pander::pander(justify = 'lllrrr',
                  digits = 4,
                  round = 4,
-                 caption = 'Multilevel quasi-poisson model diagnostics')
+                 caption = 'Multilevel quasi-Poisson model diagnostics')
 # broom.mixed::glance(mlm_qp) %>% 
 #   pander::pander(justify = 'rrrrrr',
 #                  caption = 'Multilevel quasi-poisson model diagnostics')
@@ -291,14 +362,9 @@ broom.mixed::tidy(mlm_qp) %>%
 
 ## Model discussion
 
-Discuss issues. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+BLUPs are similar to the single-level models, however with some expected shrinkage. Discuss issues. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 Discuss interpretation of effects. dio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur.
-
-
-```{r out.width="80%", fig.align='center', fig.cap="Hamming edit distance: Multilevel negative binomial effects",fig.show='hold'}
-knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
-```
 
 <!-- There's an issue here with singularities -->
 
@@ -306,9 +372,15 @@ knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
 # knitr::include_graphics("Plots/negbin_mlm_effects_all_methods.png")
 ```
 
-```{r out.width="80%", fig.align='center', fig.cap="All edit distance measures: Multilevel quasi-poisson estimates",fig.show='hold'}
+```{r out.width="80%", fig.align='center', fig.cap="All edit distance measures: Multilevel quasi-Poisson estimates",fig.show='hold'}
 knitr::include_graphics("Plots/qp_mlm_effects_all_methods.png")
 ```
+
+
+```{r out.width="80%", fig.align='center', fig.cap="Hamming edit distance: Multilevel negative binomial effects",fig.show='hold'}
+knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
+```
+
 
 
 # Associated demographics
@@ -318,12 +390,23 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
 
 
-explore other cluster solutions here that identify the elderly?
-The Hamming, Levenshtein, and OSA edit distance measures indicate that five or possibly six clusters are reasonable (Figure 6). The six-cluster solution .... contains clusters can be categorized as ...
-
 The associated demographics of these clusters skew ...
 
 
+```{r out.width="80%", fig.align='center', fig.cap="Densities of age by cluster and method",fig.show='hold'}
+knitr::include_graphics("Plots/age_densities.png")
+```
+
+```{r out.width="80%", fig.align='center', fig.cap="Sex split by cluster and method",fig.show='hold'}
+knitr::include_graphics("Plots/sex_bars.png")
+```
+
+```{r out.width="80%", fig.align='center', fig.cap="Most frequent cluster by state",fig.show='hold'}
+knitr::include_graphics("Plots/clusters_by_state.png")
+```
+
+explore other cluster solutions here that identify the elderly?
+The Hamming, Levenshtein, and OSA edit distance measures indicate that five or possibly six clusters are reasonable (Figure 6). The six-cluster solution .... contains clusters can be categorized as ...
 
 # Conclusion
 

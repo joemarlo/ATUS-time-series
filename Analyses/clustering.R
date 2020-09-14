@@ -175,9 +175,9 @@ text_labels <- tribble(
 # LCS
 # text_labels <- tribble(
 #   ~label, ~x, ~y,
-#   'Cluster 1', 4500, -90,
-#   'Cluster 2', 13250, -90,
-#   'Cluster 3', 19000, -90
+#   'Cluster 1', 4500, -110,
+#   'Cluster 2', 13250, -110,
+#   'Cluster 3', 19000, -110
 # )
 
 # plot the dendrogram
