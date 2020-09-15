@@ -43,7 +43,7 @@ panderOptions('big.mark', ',')
 
 # Background
 
-Time spent alone has been increasing among Americans. This can have numerous health effects (x,y,z) and it may be impacting subpopulations differently. Data from the American Time Use Survey shows the mean amount of time spent on non-work activities with no other person present has steadily increased from ~295min per day to ~330min per day.
+Time spent alone has been increasing among Americans. This can have numerous health effects (x,y,z) and it may be impacting subpopulations differently. Data from the American Time Use Survey shows the mean amount of time spent on non-work activities with no other person present has steadily increased from ~295min per day to ~330min per day from 2003 to 2018/
 
 
 ```{r out.width="60%", fig.align='center', fig.cap="Mean alone time 2003-2018",fig.show='hold'}
@@ -102,7 +102,7 @@ Methods
 
 The American Time Use Survey tracks alone time via a computation of other collected variables. For each activity — except those noted below — the BLS tracks the number of participants present during the activity. Alone time is tallied only during activities for which only the primary respondent is physically present.
 
-The benefit of this approach is detailed data on the length of time and description of the activity in which the person is alone. The shortcomings of this is approach is that it only pertains to physicality. Therefore activities such as phone or video calls will be labeled as 'alone.' Additionally, a few activities are specifically excluded from the tally including: 
+The benefit of this approach is detailed data on the length of time and description of the activity in which the person is alone. The shortcomings of this is approach is that it only pertains to physicality. Therefore activities such as phone or video calls will be labeled as 'alone' unless there is an additionally person physically present. Additionally, a few activities are specifically excluded from the tally including: 
 
 - Working  
 - Sleeping  
@@ -110,7 +110,7 @@ The benefit of this approach is detailed data on the length of time and descript
 - Personal/private activities  
 - Any time in which the respondent refused to provide activity detail
 
-The question posed to respondents to define who was present:
+The question posed to respondents to define who was present:  
 > "Who was in the room with you / Who accompanied you"
 
 The BLS also includes another variable, `TRTALONE_WK` which is similar to `TRTALONE` but includes alone time during work activities. This is excluded for the analysis as it is only available 2010-2018.
@@ -120,7 +120,7 @@ The BLS also includes another variable, `TRTALONE_WK` which is similar to `TRTAL
 
 # Methodology
 
-Clustering methods will be used to determine similar sequences of how individuals spend their day. Primary techniques will be using string editing techniques ([Abbot](https://www.jstor.org/stable/2780695)) and secondary techniques are model-based clustering…
+Clustering methods will be used to determine similar sequences of how individuals spend their day irrespective of alone time. Primary techniques will be using string editing techniques ((optimal matching), [Abbot](https://www.jstor.org/stable/2780695)) and secondary techniques are model-based clustering…
 
 String editing techniques will start by aggregating the different types of activities from 465 specific activities into 15 activities based on their hierarchical definitions provided by the BLS. These 15 activities will then be recoded as single character strings representing how an individual spends each 30 minute period of their day. Their full day’s activity is represented by the resulting 48 character string.
 
@@ -229,6 +229,8 @@ knitr::include_graphics(c("Plots/cluster_agreement.png", "Plots/cluster_overlap.
 
 # Modeling
 
+<!-- mlm paper gallery https://www.cmm.bris.ac.uk/gallery/ -->
+
 This is an exercise in comparing the implications of the edit distance methods. Each edit distance method will be modeled seperately, however the goal is also to understand how alone time has varied across different groups (i.e. clusters). Therefore, the unit of interest is the slope of alone time.
 
 Single-level and multilevel models are both appropriate. Multilevel models "account for individual- and group-level variation in estimating group-level regression coefficients" and "estimate regression coefficients for particular groups" (Gelman Hill 2006). However, the clustering methods are signaling only four clusters are optimal. Gelman and Hill also note that "when the number of groups is small (less than five, say), there is typically not enough information to accurately estimate group-level variation. As a result, multilevel models in this setting typically gain little beyond classical varying-coefficient models." 
@@ -267,7 +269,7 @@ Not zero inflated. Only 4% of observations are zero
 knitr::include_graphics("Plots/alone_time_densities.png")
 ```
 
-Overdispersion is an issue. The mean daily alone minutes range from 202 to 400 per each cluster and the variances range from 19,724 to 81,265. This violates an assumption of Poisson models: mean equals variance. 
+Overdispersion is an issue. The mean daily alone minutes range from 202 to 400 per each cluster and the variances range from 19,724 to 81,265. This violates an assumption of Poisson models: mean equals variance. It suggests that the standard errors in the Poisson model will be severely underestimated.
 
 Dispersion can also be defined as estimated dispersion via Gelman and Hill (2006, pg 114):
 
@@ -278,7 +280,7 @@ k &= \#\: of\: predictors  \\
 z &= standardized\: residuals = \frac{y_i - y^i}{sd(y^i)}
 \end{align*}
 
-Fitting a Poisson multilevel model to this data results in a dispersion ratio of 151.2 — far larger than 1 — indicating a quasi-Poisson or negative binomial model is neccessary.
+Fitting a Poisson multilevel model to this data results in a dispersion ratio of 151.2 — far larger than 1 — indicating a quasi-Poisson or negative binomial model is necessary. Otherwise, the standard errors will need to be corrected by mulitplying by a factor of $\sqrt{151} = 12.3$.
 
 <!-- https://easystats.github.io/performance/reference/check_overdispersion.html -->
 
@@ -289,7 +291,7 @@ Fitting a Poisson multilevel model to this data results in a dispersion ratio of
 Model equation:
 \noindent\begin{minipage}[t]{.45\linewidth}
 \begin{align*}
-log(\lambda) &= \alpha + B_1X_1 \\
+log(\lambda) &= \alpha + \beta_1X_1 \\
 \\
 &and \\
 \\
@@ -307,6 +309,7 @@ X_1 &= alone\: time \\
 \end{minipage}
 
 <!-- https://stats.stackexchange.com/questions/166506/how-to-express-a-poisson-regression-equation-as-a-quasi-poisson -->
+<!-- https://www.radstats.org.uk/no104/Marchant2_104.pdf -->
 
 The model form in R syntax is simply:  
 \begin{center}
@@ -333,8 +336,17 @@ Cluster as varying intercept and Year as fixed and random slope
 varying intercepts and varying slope which themselves vary by cluster
 
 
-Model equation
+Model equation:
 
+<!--
+\begin{align*}
+log(\lambda) &= \beta_0 + u_{0j} + e_{ij} \\
+\\
+\beta_0 = grand mean
+level 2 residual u_{0j} \sim N(), \sigman_{u0}^2)
+level 1 residual e_{0j} \sim N(), \sigman_{e0}^2)
+\end{align*}
+-->
 
 The model form in R syntax:  
 \begin{center}
@@ -362,9 +374,11 @@ broom.mixed::tidy(mlm_qp) %>%
 
 ## Model discussion
 
-BLUPs are similar to the single-level models, however with some expected shrinkage. Discuss issues. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+BLUPs are similar to the single-level models, however with some shrinkage towards zero. Discuss issues. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 Discuss interpretation of effects. dio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur.
+
+Discuss residuals
 
 <!-- There's an issue here with singularities -->
 

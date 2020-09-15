@@ -348,7 +348,7 @@ coef(mlm_nb)$cluster %>%
        x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none')
-save_plot("Plots/hamming_negbin_mlm_effects", height = 4, width = 6.5)
+save_plot("Plots/hamming_negbin_mlm_effects", height = 3, width = 6.5)
 
 # repeat for all clustering methods
 mlm_models <- final_df %>% 
@@ -462,3 +462,20 @@ cluster_slope %>%
   theme(legend.position = 'none')
 # save_plot("Plots/hamming_negbin_mlm_effects", height = 3)
 
+
+
+# bayesian ----------------------------------------------------------------
+
+#https://mc-stan.org/users/documentation/case-studies/tutorial_rstanarm.html
+
+# stratified sample
+samp <- method_df %>% 
+  group_by(cluster) %>% 
+  slice_sample(n = 1000) %>% 
+  ungroup()
+  
+# fit bayesian poisson model via MCMC with default priors
+mlm_pois_bayes <- rstanarm::stan_glmer(formula = alone_minutes ~ year + (year | cluster),
+                                  family = 'poisson', data = samp, seed = 44)
+
+summary(mlm_pois_bayes)

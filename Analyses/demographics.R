@@ -141,7 +141,8 @@ final_df %>%
   geom_polygon(aes(x = long, y = lat, group = group, fill = description), color = 'white') +
   coord_map(projection = "albers", lat0 = 38, lat1 = 45,
             xlim = c(-120, -75)) +
-  labs(title = 'Most frequent cluster compared to national average') +
+  labs(title = 'Most over represented cluster by state',
+       subtitle = 'I.e. most frequent cluster compared to national average') +
   theme(axis.title = element_blank(),
         axis.text = element_blank(),
         axis.ticks = element_blank(),
