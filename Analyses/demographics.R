@@ -146,6 +146,6 @@ final_df %>%
   theme(axis.title = element_blank(),
         axis.text = element_blank(),
         axis.ticks = element_blank(),
-        legend.title = element_text(hjust = 0),
+        legend.title = element_blank(),
         legend.position = 'right')
 save_plot("Plots/clusters_by_state")

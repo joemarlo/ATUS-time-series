@@ -334,18 +334,36 @@ knitr::include_graphics("Plots/qp_estimates.png")
 Cluster as varying intercept and Year as fixed and random slope
 
 varying intercepts and varying slope which themselves vary by cluster
+Correlated random intercept and slope
 
 
 Model equation:
 
 <!--
+$$
 \begin{align*}
-log(\lambda) &= \beta_0 + u_{0j} + e_{ij} \\
+Level\: 1: \:\: & log(\lambda_{ij}) = \beta_0 + u_{0j} + e_{ij} \\
 \\
-\beta_0 = grand mean
-level 2 residual u_{0j} \sim N(), \sigman_{u0}^2)
-level 1 residual e_{0j} \sim N(), \sigman_{e0}^2)
+Level\: 2: \:\: & \beta_0 &= grand\: mean \\
+level\: 2\: residual\: u_{0j} & \sim N(0, \sigma_{u0}^2) \\
+level\: 1\: residual\: e_{0j} & \sim N(0, \sigma_{e0}^2) \\
+\lambda &= minutes\: alone
 \end{align*}
+$$
+-->
+<!--
+$$
+\begin{align*}
+Level\: 1: \:\: & log(\lambda_{ij}) = \beta_{0j} + \beta_{1j} X_{ij} \\
+\\
+Level\: 2: \:\: & \beta_{0j} = \gamma_{00} + \gamma_{01}Z_{j} + u_{0j} \\
+& \beta_{0j} = \gamma_{10} + \gamma_{11}Z_{j} + u_{1j} \\
+u_{0j} & \sim N(0, \sigma_{u0}^2) \\
+u_{0j} & \sim N(0, \sigma_{e0}^2) \\
+
+Where:\: & \lambda_{ij} = minutes\: alone
+\end{align*}
+$$
 -->
 
 The model form in R syntax:  
@@ -415,7 +433,7 @@ knitr::include_graphics("Plots/age_densities.png")
 knitr::include_graphics("Plots/sex_bars.png")
 ```
 
-```{r out.width="80%", fig.align='center', fig.cap="Most frequent cluster by state",fig.show='hold'}
+```{r out.width="80%", fig.align='center', fig.cap="Most over represented cluster by state",fig.show='hold'}
 knitr::include_graphics("Plots/clusters_by_state.png")
 ```
 
@@ -486,4 +504,8 @@ knitr::include_graphics("Plots/poisson_effects_all_methods.png")
 
 ```{r out.width="83%", fig.align='center', fig.cap="Poisson MLM effects",fig.show='hold'}
 knitr::include_graphics("Plots/poisson_mlm_effects_all_methods.png")
+```
+
+```{r out.width="83%", fig.align='center', fig.cap="Bayesian negative binomial MLM effects",fig.show='hold'}
+knitr::include_graphics("Plots/bayes_nb_mlm_effects_hamming.png")
 ```

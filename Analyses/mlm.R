@@ -100,12 +100,16 @@ final_df %>%
 final_df %>% 
   pivot_longer(cols = contains('cluster'),
                names_to = "method", values_to = "cluster") %>% 
-  ggplot(aes(x = year, y = alone_minutes, color = cluster, group = cluster)) +
-  geom_jitter(alpha = 0.01) +
+  mutate(method = sub(pattern = "*_.*", "", method),
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+  left_join(cluster_descriptions) %>% 
+  ggplot(aes(x = year, y = alone_minutes)) +
+  # geom_jitter(alpha = 0.01) +
+  # geom_boxplot(aes(group = year)) +
   geom_smooth(method = 'glm.nb') +
-  facet_wrap(~method) +
+  facet_grid(description ~ method) +
   scale_y_continuous(labels = scales::comma_format()) +
-  coord_cartesian(ylim = c(200, 450)) +
+  # coord_cartesian(ylim = c(200, 450)) +
   labs(title = "Negative binomial models show differing patterns across clusters",
        subtitle = paste0("Weighted sample of ", 
                          scales::comma_format()(nrow(final_df)),
@@ -466,7 +470,8 @@ cluster_slope %>%
 
 # bayesian ----------------------------------------------------------------
 
-#https://mc-stan.org/users/documentation/case-studies/tutorial_rstanarm.html
+# https://mc-stan.org/users/documentation/case-studies/tutorial_rstanarm.html
+library(rstanarm)
 
 # stratified sample
 samp <- method_df %>% 
@@ -475,7 +480,50 @@ samp <- method_df %>%
   ungroup()
   
 # fit bayesian poisson model via MCMC with default priors
-mlm_pois_bayes <- rstanarm::stan_glmer(formula = alone_minutes ~ year + (year | cluster),
-                                  family = 'poisson', data = samp, seed = 44)
+mlm_nb_bayes <- rstanarm::stan_glmer(formula = alone_minutes ~ year + (year | cluster),
+                                  family = rstanarm::neg_binomial_2, data = samp, 
+                                  iter = 3000, seed = 44)
+summary(mlm_nb_bayes, digits = 4)
+prior_summary(mlm_nb_bayes)
 
-summary(mlm_pois_bayes)
+# check convergence and effective sample size
+plot(mlm_nb_bayes, "rhat")
+plot(mlm_nb_bayes, "ess")
+
+coef(mlm_nb_bayes)
+ranef(mlm_nb_bayes)
+
+# fixed plus random
+# fixef(mlm_nb_bayes)['year'] + ranef(mlm_nb)$cluster$year
+
+# pull credible interval of the effects
+estimates <- summary(mlm_nb_bayes, 
+        regex_pars = c("year", "b\\[\\year *"),
+        probs = c(0.025, 0.50, 0.975),
+        digits = 4) %>% 
+  as.data.frame() %>% 
+  .[,c('mean', '2.5%', '97.5%')]
+
+# add the slopes together and plot
+(rbind(estimates['year',],
+      estimates['year',],
+      estimates['year',],
+      estimates['year',]) +
+  estimates[2:5,]) %>%
+  as_tibble() %>% 
+  mutate(description = factor(c('Day workers', 'Night workers', 'Students', 'Uncategorized'), 
+                              levels = c('Day workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
+  ggplot(aes(x = mean, y = reorder(description, 4:1), color = description,
+             xmin = `2.5%`, xmax = `97.5%`)) +
+  geom_point() +
+  geom_linerange() +
+  scale_y_discrete(position = "right") +
+  # scale_x_continuous(limits = c(-0.025, 0.015)) +
+  # facet_grid(description~., scales = 'free_x') +
+  labs(title = "Bayesian negative binomial estimates and 95% credible interval",
+       # subtitle = 'Four MLM models fitted individually by edit distance method ",
+       x = "\nAnnual change in time spent alone",
+       y = NULL) +
+  theme(legend.position = 'none',
+        strip.text.y = element_text(size = 7))
+save_plot("Plots/bayes_nb_mlm_effects_hamming", height = 3, width = 6.5)
