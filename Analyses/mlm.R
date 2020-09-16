@@ -333,12 +333,17 @@ qqline(ranef(mlm_qp)[, 2])
 # cov_var_matrices <- attr(ranef(mlm_nb, condVar = TRUE)[[1]], "postVar")
 
 # extract the standard error of the random errors
+# this is done through the conditional variance-covariance matrices 
+# https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#confidence-intervals-on-conditional-meansblupsrandom-effects
 standard_errors <- arm::se.ranef(mlm_nb)$cluster[,'year']
+# broom.mixed::tidy(mlm_nb, effects = "ran_vals")
+
 
 # plot the BLUPs and their SE
 coef(mlm_nb)$cluster %>%  
   as.data.frame() %>% 
   rownames_to_column() %>% 
+  # I believe this addition assumes independence of the conditional variance and fixed effect sampling variance
   mutate(lower = year - (1.96 * standard_errors),
          upper = year + (1.96 * standard_errors)) %>% 
   ggplot(aes(x = year, y = reorder(rowname, 4:1), 
@@ -362,7 +367,7 @@ mlm_models <- final_df %>%
   mutate(method = sub(pattern = "*_.*", "", method),
          cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
   left_join(cluster_descriptions) %>%
-  select(alone_minutes, year, method, cluster = description) %>% 
+  select(alone_minutes, year, method, cluster = description, age, sex) %>% 
   group_by(method) %>% 
   rownames_to_column('id') %>% # for overdispersion parameter
   nest() %>% 
@@ -474,15 +479,17 @@ cluster_slope %>%
 library(rstanarm)
 
 # stratified sample
-samp <- method_df %>% 
-  group_by(cluster) %>% 
-  slice_sample(n = 1000) %>% 
-  ungroup()
+# samp <- method_df %>% 
+#   group_by(cluster) %>% 
+#   # slice_sample(n = 1000) %>% 
+#   ungroup()
   
 # fit bayesian poisson model via MCMC with default priors
+# takes >5 hours on the 25k observations
 mlm_nb_bayes <- rstanarm::stan_glmer(formula = alone_minutes ~ year + (year | cluster),
-                                  family = rstanarm::neg_binomial_2, data = samp, 
-                                  iter = 3000, seed = 44)
+                                  family = rstanarm::neg_binomial_2, data = method_df, 
+                                  adapt_delta = 0.9, iter = 3000, seed = 44)
+save(mlm_nb_bayes, file = "Analyses/bayesian_mlm_hamming.RData")
 summary(mlm_nb_bayes, digits = 4)
 prior_summary(mlm_nb_bayes)
 
@@ -505,6 +512,7 @@ estimates <- summary(mlm_nb_bayes,
   .[,c('mean', '2.5%', '97.5%')]
 
 # add the slopes together and plot
+# this assumes independence b/t the intercept and slope
 (rbind(estimates['year',],
       estimates['year',],
       estimates['year',],
@@ -521,7 +529,7 @@ estimates <- summary(mlm_nb_bayes,
   # scale_x_continuous(limits = c(-0.025, 0.015)) +
   # facet_grid(description~., scales = 'free_x') +
   labs(title = "Bayesian negative binomial estimates and 95% credible interval",
-       # subtitle = 'Four MLM models fitted individually by edit distance method ",
+       subtitle = 'MLM models fitted on clusters determined by Hamming edit distance',
        x = "\nAnnual change in time spent alone",
        y = NULL) +
   theme(legend.position = 'none',

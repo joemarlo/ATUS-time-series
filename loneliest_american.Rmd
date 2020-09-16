@@ -280,7 +280,7 @@ k &= \#\: of\: predictors  \\
 z &= standardized\: residuals = \frac{y_i - y^i}{sd(y^i)}
 \end{align*}
 
-Fitting a Poisson multilevel model to this data results in a dispersion ratio of 151.2 — far larger than 1 — indicating a quasi-Poisson or negative binomial model is necessary. Otherwise, the standard errors will need to be corrected by mulitplying by a factor of $\sqrt{151} = 12.3$.
+Fitting a Poisson multilevel model to this data results in a dispersion ratio of 151.2 — far larger than 1 — indicating a quasi-Poisson or negative binomial model is necessary. Otherwise, the standard errors will need to be corrected by multiplying by a factor of $\sqrt{151} = 12.3$.
 
 <!-- https://easystats.github.io/performance/reference/check_overdispersion.html -->
 
@@ -316,7 +316,7 @@ The model form in R syntax is simply:
 \texttt{Alone time $\sim$ year}
 \end{center}
 
-Briefly discuss model fit. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+Briefly discuss model fit. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. The standard errors on thee coefficient are as large as the estimates themselves, indicating there is far too much noise in this signal to be certain of the pattern.  
 
 The coefficient for year is the difference in log counts. This can be also interpreted as the percentage increase in alone minutes per year. The only cluster to consistently and significantly differ from zero is the "Students" cluster. These point estimates range from -0.010 to -0.015, meaning the mean amount of alone time for students decreased at a rate of 1.0 to 1.5% per year from 2003 to 2018.  
 
