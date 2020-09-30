@@ -4,7 +4,7 @@ author: "Joe Marlo"
 date: "`r Sys.Date()`"
 subtitle: "Draft"
 abstract: |
-  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Arcu dictum varius duis at consectetur lorem donec massa. Vestibulum lectus mauris ultrices eros in cursus turpis massa tincidunt. Dui accumsan sit amet nulla. At tellus at urna condimentum mattis pellentesque id nibh tortor. Interdum velit euismod in pellentesque massa placerat. Massa sed elementum tempus egestas. Turpis egestas integer eget aliquet nibh. Cursus eget nunc scelerisque viverra mauris in aliquam sem. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Arcu dictum varius duis at consectetur lorem donec massa. Vestibulum lectus mauris ultrices eros in cursus turpis massa tincidunt. Dui accumsan sit amet nulla. At tellus at urna condimentum mattis pellentesque id nibh tortor. Interdum velit euismod in pellentesque massa placerat. Massa sed elementum tempus egestas. Turpis egestas integer eget aliquet nibh. Cursus eget nunc scelerisque viverra mauris in aliquam sem. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit.
 output:
   pdf_document:
     toc: true
@@ -59,13 +59,13 @@ It’s intuitive that this increase may not be evenly distributed across the pop
 >Are increases in time spent alone equally affecting different subpopulations of Americans?
 
 
-# Literature 
+# Literature
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
+Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit.
 
-Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit.
 
 Arcu dictum varius duis at consectetur lorem donec massa. Vestibulum lectus mauris ultrices eros in cursus turpis massa tincidunt. Dui accumsan sit amet nulla. At tellus at urna condimentum mattis pellentesque id nibh tortor. Interdum velit euismod in pellentesque massa placerat. Massa sed elementum tempus egestas. Turpis egestas integer eget aliquet nibh. Cursus eget nunc scelerisque viverra mauris in aliquam sem.
 
@@ -102,7 +102,7 @@ Methods
 
 The American Time Use Survey tracks alone time via a computation of other collected variables. For each activity — except those noted below — the BLS tracks the number of participants present during the activity. Alone time is tallied only during activities for which only the primary respondent is physically present.
 
-The benefit of this approach is detailed data on the length of time and description of the activity in which the person is alone. The shortcomings of this is approach is that it only pertains to physicality. Therefore activities such as phone or video calls will be labeled as 'alone' unless there is an additionally person physically present. Additionally, a few activities are specifically excluded from the tally including: 
+The benefit of this approach is detailed data on the length of time and description of the activity in which the person is alone. The shortcomings of this is approach is that it only pertains to physicality. Therefore activities such as phone or video calls will be labeled as 'alone' unless there is an additionally person physically present. Additionally, a few activities are specifically excluded from the tally including:
 
 - Working  
 - Sleeping  
@@ -117,6 +117,10 @@ The BLS also includes another variable, `TRTALONE_WK` which is similar to `TRTAL
 
 <!-- verified physicality by looking at phone calls. 70% of phone calls have no one else present -->
 
+
+## American Time Use Survey
+
+The American Time Use Survey data contains a nationally representative estimates of how, where, and with whom Americans spend their time. The sampling frame is the Census Current Population Survey (CPS) and covers over 200,000 interviews conducted from 2003 to 2018. The survey is phone-based, repeated cross-section, and randomized by day of the week. The data can be linked to the CPS for detailed household demographic information. 
 
 # Methodology
 
@@ -142,8 +146,8 @@ The distance between the respondents string sequences can be calculated using a 
 
 - Levenshtein distance: insertions, deletions or substitutions  
 - Restricted Damerau-Levenshtein distance (OSA): insertions, deletions or substitutions of a single character, or transposition of two adjacent characters  
-- Hamming distanc: substitutions only  
-- Longest common subsequence: insertions and deletions only  
+- Hamming distance: substitutions only. Between two strings of identical length - e.g. a given 24 hour day - it is the number of positions in which corresponding characters differ
+- Longest common sub-sequence: insertions and deletions only  
 
 Each of these have advantages and disadvantages that will be explored along with their impact on the final clustering.
 
@@ -152,7 +156,7 @@ Each of these have advantages and disadvantages that will be explored along with
 
 # Clustering
 
-Discuss clustering methods. Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+Discuss clustering methods. Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit.
 
 ## Efficacy of cross-sectional clustering
 
@@ -178,13 +182,13 @@ knitr::include_graphics(c("Analyses/Pre-post-comparison/Levenshtein 2003-2010_pr
 
 ## Final clusters
 
-The final clusters were created using a weighted sample of 25,000 respondents from the 2003-2018 surveys. 
+The final clusters were created using a weighted sample of 25,000 respondents from the 2003-2018 surveys.
 
-Discuss silhouettes and dendrogram. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
+Discuss silhouettes and dendrogram. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit.
 
-Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit.  Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. 
+Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit.  Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur.
 
- 
+
 ```{r out.width="45%", fig.align='center', fig.cap="Silhouette distances",fig.show='hold'}
 knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_silhouette.png", "Analyses/Levenshtein/Plots/Levenshtein_silhouette.png",
                           "Analyses/OSA/Plots/OSA_silhouette.png", "Analyses/LCS/Plots/LCS_silhouette.png"))
@@ -195,7 +199,7 @@ knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_dendrogram.png", "Anal
 ```
 
 
-Discuss sequence plots and patterns. Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
+Discuss sequence plots and patterns. Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit.
 
 - LCS materially different: making no distinct between daytime and nighttime workers
 
@@ -212,14 +216,14 @@ knitr::include_graphics(c("Analyses/Hamming/Plots/Hamming_proportion_plots.png",
 
 ## Categorization of clusters
 
-The sequence and proportion plots illustrate the contents of each cluster are mostly consistent across the edit distance methods with the exception of LCS. Each cluster can therefore be identified across methods using their common characteristics: one cluster consisting of mostly daytime work will now be labeled as "Day workers", a second cluster of mostly evening and night work "Night workers", a third dominated by education "Students", and then the fourth contains a mixture of activities with no dominate characteristics so this will be referred to as "Uncategorized." 
+The sequence and proportion plots illustrate the contents of each cluster are mostly consistent across the edit distance methods with the exception of LCS. Each cluster can therefore be identified across methods using their common characteristics: one cluster consisting of mostly daytime work will now be labeled as "Day workers", a second cluster of mostly evening and night work "Night workers", a third dominated by education "Students", and then the fourth contains a mixture of activities with no dominate characteristics so this will be referred to as "Uncategorized."
 
 
 ## Distance measure comparison
 
 Visual inspections of the sequence and proportion plots appear to show consistency across the various edit distance measures. This is verified by examining the agreement in cluster membership. First, 90% of the respondents are clustered into the "same" cluster across methods. The remaining ~10% match to two separate clusters, and a small amount match to three. This is most likely due to the LCS method optimizing for a three cluster solution.
 
-The pattern is clearer examined on a respondent-level basis. The right plot in Figure # shows the cluster assignment per respondent per method. Homogenous colors horizontally indicate full agreement across the edit distance measures. 
+The pattern is clearer examined on a respondent-level basis. The right plot in Figure # shows the cluster assignment per respondent per method. Homogenous colors horizontally indicate full agreement across the edit distance measures.
 
 ```{r out.width="45%", fig.align='center', fig.cap="Cluster agreement across methods",fig.show='hold'}
 knitr::include_graphics(c("Plots/cluster_agreement.png", "Plots/cluster_overlap.png"))
@@ -233,7 +237,7 @@ knitr::include_graphics(c("Plots/cluster_agreement.png", "Plots/cluster_overlap.
 
 This is an exercise in comparing the implications of the edit distance methods. Each edit distance method will be modeled seperately, however the goal is also to understand how alone time has varied across different groups (i.e. clusters). Therefore, the unit of interest is the slope of alone time.
 
-Single-level and multilevel models are both appropriate. Multilevel models "account for individual- and group-level variation in estimating group-level regression coefficients" and "estimate regression coefficients for particular groups" (Gelman Hill 2006). However, the clustering methods are signaling only four clusters are optimal. Gelman and Hill also note that "when the number of groups is small (less than five, say), there is typically not enough information to accurately estimate group-level variation. As a result, multilevel models in this setting typically gain little beyond classical varying-coefficient models." 
+Single-level and multilevel models are both appropriate. Multilevel models "account for individual- and group-level variation in estimating group-level regression coefficients" and "estimate regression coefficients for particular groups" (Gelman Hill 2006). However, the clustering methods are signaling only four clusters are optimal. Gelman and Hill also note that "when the number of groups is small (less than five, say), there is typically not enough information to accurately estimate group-level variation. As a result, multilevel models in this setting typically gain little beyond classical varying-coefficient models."
 
 <!-- what is a varying-coefficient model? -->
 
@@ -261,7 +265,7 @@ As such, the approach is to fit both single- and multilevel models and draw comp
 
 ## Count data and overdispersion
 
-Describe data. egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
+Describe data. egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit.
 
 Not zero inflated. Only 4% of observations are zero
 
@@ -368,23 +372,23 @@ $$
 
 The model form in R syntax:  
 \begin{center}
-\texttt{Alone time $\sim$ cluster + (cluster | year )}
+\texttt{Alone time $\sim$ year + (year | cluster)}
 \end{center}
 
 
 ## Model fit
 
-Describe diagnostics, residuals, etc. Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+Describe diagnostics, residuals, etc. Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit.
 
 
 ```{r}
-broom.mixed::tidy(mlm_qp) %>% 
-  .[, 1:6] %>% 
+broom.mixed::tidy(mlm_qp) %>%
+  .[, 1:6] %>%
   pander::pander(justify = 'lllrrr',
                  digits = 4,
                  round = 4,
                  caption = 'Multilevel quasi-Poisson model diagnostics')
-# broom.mixed::glance(mlm_qp) %>% 
+# broom.mixed::glance(mlm_qp) %>%
 #   pander::pander(justify = 'rrrrrr',
 #                  caption = 'Multilevel quasi-poisson model diagnostics')
 ```
@@ -419,7 +423,7 @@ knitr::include_graphics("Plots/hamming_negbin_mlm_effects.png")
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit. 
+Mattis enim ut tellus elementum sagittis vitae et. Odio pellentesque diam volutpat commodo sed egestas egestas fringilla. Consectetur lorem donec massa sapien faucibus. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Metus dictum at tempor commodo. Aliquam etiam erat velit scelerisque in dictum non consectetur. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Nibh venenatis cras sed felis eget velit.
 
 
 The associated demographics of these clusters skew ...
@@ -442,7 +446,7 @@ The Hamming, Levenshtein, and OSA edit distance measures indicate that five or p
 
 # Conclusion
 
-Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit. 
+Facilisi cras fermentum odio eu. Quis enim lobortis scelerisque fermentum dui faucibus in. Commodo elit at imperdiet dui. Mi quis hendrerit dolor magna eget. Scelerisque purus semper eget duis at tellus at. Aliquet bibendum enim facilisis gravida neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Aliquet lectus proin nibh nisl condimentum. A cras semper auctor neque vitae. Lobortis scelerisque fermentum dui faucibus in ornare quam viverra orci. Est lorem ipsum dolor sit amet consectetur adipiscing elit.
 
 Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis. Ultricies mi quis hendrerit dolor magna eget est. Pharetra diam sit amet nisl suscipit adipiscing. Donec pretium vulputate sapien nec. Arcu odio ut sem nulla pharetra. Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi.
 
@@ -493,7 +497,7 @@ tribble(
   't1819.*',  'Other',
   't189.*',  'Other',
   't50.*',    'Other'
-) %>% 
+) %>%
   pander::pander(justify = 'left',
                  caption = 'Activity aggregation mapping')
 ```

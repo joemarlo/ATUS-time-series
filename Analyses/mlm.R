@@ -6,11 +6,6 @@ options(mc.cores = parallel::detectCores())
 set.seed(44)
 options(scipen = 999)
 
-select <- function(...){
-  # MASS also has a select() function so this prioritizes dplyr's select()
-  dplyr::select(...)
-}
-
 # read in the demographics data
 demographics <- read_delim(file = "Inputs/demographic.tsv",
                            delim = "\t",
@@ -37,7 +32,7 @@ rm(hamming_clusters, lcs_clusters, levenshtein_clusters, osa_clusters)
 # create dataframe of variables of interest; factorized the cluster variables
 final_df <- clusters_df %>% 
   left_join(demographics, by = "ID") %>% 
-  dplyr::select(ID, contains("cluster"), age, sex, state, alone_minutes = TRTALONE, year) %>% 
+  select(ID, contains("cluster"), age, sex, state, alone_minutes = TRTALONE, year) %>% 
   mutate(across(contains("cluster"), ~ {
     x <- if_else(.x == 1, "Cluster 1", as.character(.x))
     x <- factor(x, levels = c("Cluster 1", as.character(2:4))) 
@@ -76,6 +71,22 @@ final_df %>%
   labs(title = "Sample size per cluster per year",
        x = "Year",
        y = "n")
+
+# plot the distribution by cluster and method
+final_df %>% 
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>% 
+  mutate(method = sub(pattern = "*_.*", "", method),
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+  left_join(cluster_descriptions) %>% 
+  mutate(alone_minutes = sqrt(alone_minutes)) %>% 
+  ggplot(aes(x = alone_minutes, color = method)) +
+  geom_density() +
+  facet_wrap(~description)
+ggsave("Plots/sqrt_transform.png",
+       device = "png",
+       height = 5,
+       width = 7)
 
 # plot the mean alone time per cluster and method
 # final_df %>%
@@ -174,7 +185,7 @@ clusters_df %>%
   mutate(method = sub(pattern = "*_.*", "", method)) %>%
   left_join(cluster_descriptions) %>%
   group_by(ID) %>%
-  summarize(n_memberships = length(table(description))) %>%
+  summarize(n_memberships = length(unique(description))) %>%
   ggplot(aes(x = n_memberships)) +
   geom_bar(aes(y = ..count.. / sum(..count..))) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1.0),
@@ -535,3 +546,107 @@ estimates <- summary(mlm_nb_bayes,
   theme(legend.position = 'none',
         strip.text.y = element_text(size = 7))
 save_plot("Plots/bayes_nb_mlm_effects_hamming", height = 3, width = 6.5)
+
+
+
+
+# fit linear mlm on transformed data --------------------------------------
+
+# hypothesis test of poisson
+gf_tests <- final_df %>% 
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>% 
+  mutate(method = sub(pattern = "*_.*", "", method),
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+  left_join(cluster_descriptions) %>%
+  select(alone_minutes, year, method, cluster = description, age, sex) %>% 
+  group_by(method, cluster) %>% 
+  summarize(fit = list(vcd::goodfit(alone_minutes, type = "nbinomial")))
+
+# plot(gf_tests$fit[[1]])
+# summary(gf_tests$fit[[1]])
+
+# all p vals == 2 so indicating not a neg binomial for any of the clusters
+lapply(gf_tests$fit, summary)
+
+# test sqrt transform for normality
+final_df %>% 
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>% 
+  mutate(method = sub(pattern = "*_.*", "", method),
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+  left_join(cluster_descriptions) %>% 
+  mutate(alone_minutes = sqrt(alone_minutes)) %>% 
+  group_by(method, cluster) %>%
+  summarize(fit = shapiro.test(sample(alone_minutes, 500))$p.val)
+
+# fit linear mlms for all clustering methods
+mlm_models <- final_df %>% 
+  mutate(year = year - min(year)) %>% 
+  pivot_longer(cols = contains('cluster'),
+               names_to = "method", values_to = "cluster") %>% 
+  mutate(method = sub(pattern = "*_.*", "", method),
+         cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
+  left_join(cluster_descriptions) %>%
+  select(alone_minutes, year, method, cluster = description, age, sex) %>% 
+  mutate(alone_minutes = sqrt(alone_minutes)) %>% 
+  group_by(method) %>% 
+  nest() %>% 
+  mutate(model = map(data, function(df){
+    lme4::lmer(alone_minutes ~ year + (year | cluster), 
+               data = df,
+               control = lmerControl(optimizer = "bobyqa", 
+                                     optCtrl = list(maxfun = 2e5)))
+  }))
+
+# test logLik
+logLik(mlm_models$model[[1]])
+mlm_models$model[[1]] %>% residuals() %>% density() %>% plot()
+mlm_qp %>% residuals() %>% density() %>% plot()
+logLik(mlm_qp)
+logLik(mlm_nb)
+
+y <- mlm_models$data[[1]]$alone_minutes^2
+
+plot(y, predict(mlm_models$model[[1]])^2)
+plot(y, predict(mlm_qp))
+
+# residuals of niether are normally distributed
+plot(density(predict(mlm_models$model[[1]])^2 - y))
+plot(density(predict(mlm_qp) - y))
+
+# mean of residuals
+mean(predict(mlm_models$model[[1]])^2 - y)
+mean(predict(mlm_qp) - y)
+
+
+# calculate confidence interval and plot
+mlm_models %>% 
+  mutate(tidied = map(model, function(model){
+    # extract the standard error of the random errors
+    standard_errors <- arm::se.ranef(model)$cluster[,'year']
+    
+    # calculate the confidence interval
+    coef(model)$cluster %>% 
+      as.data.frame() %>%
+      rownames_to_column() %>%
+      mutate(lower = year - (1.96 * standard_errors),
+             upper = year + (1.96 * standard_errors))
+  })) %>% 
+  unnest(tidied) %>% 
+  select(method, description = rowname, estimate = year, lower, upper) %>% 
+  ungroup() %>% 
+  mutate(description = factor(description, 
+                              levels = c('Day workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
+  ggplot(aes(x = estimate, y = method, color = description, xmin = lower, xmax = upper)) +
+  geom_point() +
+  geom_linerange() +
+  # scale_x_continuous(limits = c(-0.025, 0.015)) +
+  facet_grid(description~., scales = 'free_x') +
+  labs(title = "Estimates from linear MLMs", # and 95% confidence interval",
+       subtitle = "Four MLM models fitted individually by edit distance method ",
+       x = "\nAnnual change in sqrt(time spent alone)",
+       y = NULL) +
+  theme(legend.position = 'none',
+        strip.text.y = element_text(size = 7))
+save_plot("Plots/linear_mlms", height = 5.5, width = 6.5)
