@@ -1,6 +1,7 @@
 library(tidyverse)
 library(dendextend)
 library(NbClust)
+library(fastcluster)
 library(stringdist)
 source("Plots/ggplot_settings.R")
 options(mc.cores = parallel::detectCores())
@@ -23,7 +24,7 @@ n_sample <- nrow(atus_string_samp)
 # distance ----------------------------------------------------------------
 
 # compute the string distances
-distance_method <- "osa" # "lv" "hamming" "osa" "lcs"
+distance_method <- "hamming" # "lv" "hamming" "osa" "lcs"
 distance_method_pretty <- case_when(distance_method == 'hamming' ~ "Hamming",
                                     distance_method == 'osa' ~ "OSA",
                                     distance_method == 'lcs' ~ 'LCS',
@@ -107,7 +108,7 @@ hcl_ward <- hclust(d = dist_matrix, method = 'ward.D2')
 # color the dendrogram and get the cluster membership ---------------------
 
 # trimmed, colored branches tree
-hcl_k <- hclust_sw$Best.nc[['Number_clusters']]
+hcl_k <- 5 #hclust_sw$Best.nc[['Number_clusters']]
 dend <- as.dendrogram(hcl_ward) %>% set("branches_k_color", k = hcl_k) %>% set("labels_colors")
 dend <- cut(dend, h = 50)$upper # cut off bottom of dendogram for computation performance
 ggd1 <- as.ggdend(dend)
@@ -171,6 +172,46 @@ text_labels <- tribble(
   'Cluster 3', 17000, -70,
   'Cluster 4', 24000, -70
 )
+# lv 5
+text_labels <- tribble(
+  ~label, ~x, ~y,
+  '1', 800, -70,
+  'Cluster 2', 2500, -70,
+  'Cluster 3', 7000, -70,
+  'Cluster 4', 17000, -70,
+  'Cluster 5', 24000, -70
+)
+# lv 6
+text_labels <- tribble(
+  ~label, ~x, ~y,
+  '1', 800, -70,
+  'Cluster 2', 2500, -70,
+  '3', 4600, -70,
+  'Cluster 4', 9000, -70,
+  'Cluster 5', 17000, -70,
+  'Cluster 6', 24000, -70
+)
+
+# hamming 6
+text_labels <- tribble(
+  ~label, ~x, ~y,
+  'Cluster 1', 2500, -70,
+  'Cluster 2', 8000, -70,
+  '3', 12000, -70,
+  '4', 13300, -70,
+  'Cluster 5', 16500, -70,
+  'Cluster 6', 21000, -70
+)
+
+# hamming 5
+text_labels <- tribble(
+  ~label, ~x, ~y,
+  'Cluster 1', 2500, -70,
+  'Cluster 2', 8000, -70,
+  '3', 12000, -70,
+  '4', 13300, -70,
+  'Cluster 5', 19000, -70
+)
 
 # LCS
 # text_labels <- tribble(
@@ -199,7 +240,7 @@ ggplot(ggd1$segments) +
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.position = 'none')
-save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_dendrogram"))
+save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_", hcl_k, "_dendrogram_"))
 
 
 # examine the cluster sequences -------------------------------------------
@@ -248,7 +289,7 @@ atus_samp %>%
        x = "Time of day", 
        y = "Individuals") +
   theme(legend.position = 'right')
-save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_sequence_plots"),
+save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_", hcl_k, "_sequence_plots"),
           height = 5,
           width = 8,
           dpi = 700)
@@ -274,7 +315,7 @@ atus_samp %>%
   theme(legend.position = 'right',
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_blank())
-save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_proportion_plots"),
+save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", distance_method_pretty, "_", hcl_k, "_proportion_plots"),
           height = 5,
           width = 8,
           dpi = 700)
@@ -285,7 +326,7 @@ save_plot(filename = paste0("Analyses/", distance_method_pretty, "/Plots/", dist
 atus_string_samp %>% 
   select(ID, cluster) %>% 
   rename_with(function(x) paste0(distance_method, "_cluster"), .cols = cluster) %>% 
-  write_csv(path = paste0("Analyses/", distance_method_pretty, "/", distance_method_pretty, "_clusters.csv"))
+  write_csv(path = paste0("Analyses/", distance_method_pretty, "/", distance_method_pretty, "_", hcl_k, "_clusters.csv"))
 
 save(hclust_sw, dist_matrix, hcl_ward,
      file = paste0("Analyses/", distance_method_pretty, "/", distance_method_pretty, "_cluster_data.Rdata"))

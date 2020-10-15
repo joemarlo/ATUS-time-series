@@ -133,19 +133,19 @@ ggsave(filename = "Plots/negative_binomial.png",
        height = 7,
        width = 7)
 
-# fit the previously plotted negative binomial models individually and examine the coeficients
+# fit the previously plotted negative binomial models individually and examine the coefficients
 nb_models <- final_df %>% 
   pivot_longer(cols = contains('cluster'),
                names_to = "method", values_to = "cluster") %>% 
   group_by(method, cluster) %>% 
   nest() %>% 
   mutate(#model = map(data, function(df) MASS::glm.nb(alone_minutes ~ year, data = df)),
-         model = map(data, function(df) glm(alone_minutes ~ year, data = df, family = quasipoisson(link = 'log'))),
-         tidied = map(model, broom::tidy),
-         confint = map(model, function(model){
-           cf <- confint(model)
-           tibble(lower = cf[2,1], upper = cf[2,2])
-                })) %>% 
+    model = map(data, function(df) glm(alone_minutes ~ year, data = df, family = quasipoisson(link = 'log'))),
+    tidied = map(model, broom::tidy),
+    confint = map(model, function(model){
+      cf <- confint(model)
+      tibble(lower = cf[2,1], upper = cf[2,2])
+    })) %>% 
   unnest(c(tidied, confint)) %>% 
   select(-data) %>% 
   ungroup()
@@ -195,7 +195,7 @@ clusters_df %>%
        x = "Count of unique cluster memberships",
        y = "Percent of respondents")
 save_plot("Plots/cluster_agreement", height = 6)
-  
+
 # overlap of cluster membership
 clusters_df %>% 
   pivot_longer(cols = contains('cluster'),
@@ -304,7 +304,7 @@ broom.mixed::glance(mlm_nb)
 coef(mlm_nb)
 
 mlm_pois <- glmer(alone_minutes ~ year + (year | cluster), 
-             data = method_df, family=poisson(link="log"))
+                  data = method_df, family=poisson(link="log"))
 performance::check_overdispersion(mlm_pois)
 
 # gelman hill 2006 pg115
@@ -387,8 +387,8 @@ mlm_models <- final_df %>%
     #                data = df, verbose = TRUE, 
     #                # initCtrl = list(theta = 1.122),
     #                control = glmerControl(optCtrl = list(maxfun = 1e5)))
-                   # control = glmerControl(optimizer = "Nelder_Mead",
-                   #                        optCtrl = list(maxfun = 1e6)))
+    # control = glmerControl(optimizer = "Nelder_Mead",
+    #                        optCtrl = list(maxfun = 1e6)))
     # theta parameter pulled from first fitting model to the hamming group
     # this fixes convergence errors for the other models
     
@@ -433,9 +433,9 @@ mlm_models %>%
     coef(model) %>% 
       as.data.frame() %>%
       rownames_to_column()# %>%
-      # mutate(lower = year - (1.96 * standard_errors),
-      #        upper = year + (1.96 * standard_errors))
-         })) %>% 
+    # mutate(lower = year - (1.96 * standard_errors),
+    #        upper = year + (1.96 * standard_errors))
+  })) %>% 
   unnest(tidied) %>% 
   select(method, description = rowname, estimate = year) %>% #, lower, upper) %>% 
   ungroup() %>% 
@@ -494,12 +494,12 @@ library(rstanarm)
 #   group_by(cluster) %>% 
 #   # slice_sample(n = 1000) %>% 
 #   ungroup()
-  
+
 # fit bayesian poisson model via MCMC with default priors
 # takes >5 hours on the 25k observations
 mlm_nb_bayes <- rstanarm::stan_glmer(formula = alone_minutes ~ year + (year | cluster),
-                                  family = rstanarm::neg_binomial_2, data = method_df, 
-                                  adapt_delta = 0.9, iter = 3000, seed = 44)
+                                     family = rstanarm::neg_binomial_2, data = method_df, 
+                                     adapt_delta = 0.9, iter = 3000, seed = 44)
 save(mlm_nb_bayes, file = "Analyses/bayesian_mlm_hamming.RData")
 summary(mlm_nb_bayes, digits = 4)
 prior_summary(mlm_nb_bayes)
@@ -516,19 +516,19 @@ ranef(mlm_nb_bayes)
 
 # pull credible interval of the effects
 estimates <- summary(mlm_nb_bayes, 
-        regex_pars = c("year", "b\\[\\year *"),
-        probs = c(0.025, 0.50, 0.975),
-        digits = 4) %>% 
+                     regex_pars = c("year", "b\\[\\year *"),
+                     probs = c(0.025, 0.50, 0.975),
+                     digits = 4) %>% 
   as.data.frame() %>% 
   .[,c('mean', '2.5%', '97.5%')]
 
 # add the slopes together and plot
 # this assumes independence b/t the intercept and slope
 (rbind(estimates['year',],
-      estimates['year',],
-      estimates['year',],
-      estimates['year',]) +
-  estimates[2:5,]) %>%
+       estimates['year',],
+       estimates['year',],
+       estimates['year',]) +
+    estimates[2:5,]) %>%
   as_tibble() %>% 
   mutate(description = factor(c('Day workers', 'Night workers', 'Students', 'Uncategorized'), 
                               levels = c('Day workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
@@ -570,6 +570,7 @@ gf_tests <- final_df %>%
 lapply(gf_tests$fit, summary)
 
 # test sqrt transform for normality
+# all reject the null of normality
 final_df %>% 
   pivot_longer(cols = contains('cluster'),
                names_to = "method", values_to = "cluster") %>% 
@@ -577,8 +578,8 @@ final_df %>%
          cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
   left_join(cluster_descriptions) %>% 
   mutate(alone_minutes = sqrt(alone_minutes)) %>% 
-  group_by(method, cluster) %>%
-  summarize(fit = shapiro.test(sample(alone_minutes, 500))$p.val)
+  group_by(method, description) %>%
+  summarize(p_val = shapiro.test(sample(alone_minutes, 500))$p.val)
 
 # fit linear mlms for all clustering methods
 mlm_models <- final_df %>% 
