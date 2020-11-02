@@ -16,11 +16,11 @@ demographics <- read_delim(file = "Inputs/demographic.tsv",
 hamming_clusters <- read_csv(file = "Analyses/Hamming/Hamming_clusters.csv", 
                              col_types = cols(hamming_cluster = col_integer()))
 lcs_clusters <- read_csv(file = "Analyses/LCS/LCS_clusters.csv", 
-                             col_types = cols(lcs_cluster = col_integer()))
+                         col_types = cols(lcs_cluster = col_integer()))
 levenshtein_clusters <- read_csv(file = "Analyses/Levenshtein/Levenshtein_clusters.csv", 
-                             col_types = cols(lv_cluster = col_integer()))
+                                 col_types = cols(lv_cluster = col_integer()))
 osa_clusters <- read_csv(file = "Analyses/OSA/OSA_clusters.csv", 
-                             col_types = cols(osa_cluster = col_integer()))
+                         col_types = cols(osa_cluster = col_integer()))
 
 # join all the clusters dfs together and remove duplicates (due to weighted sampling)
 clusters_df <- Reduce(
@@ -32,11 +32,11 @@ rm(hamming_clusters, lcs_clusters, levenshtein_clusters, osa_clusters)
 # create dataframe of variables of interest; factorized the cluster variables
 final_df <- clusters_df %>% 
   left_join(demographics, by = "ID") %>% 
-  select(ID, contains("cluster"), age, sex, state, alone_minutes = TRTALONE, year) %>% 
+  dplyr::select(ID, contains("cluster"), age, sex, state, alone_minutes = TRTALONE, year) %>% 
   mutate(across(contains("cluster"), ~ {
     x <- if_else(.x == 1, "Cluster 1", as.character(.x))
     x <- factor(x, levels = c("Cluster 1", as.character(2:4))) 
-    }))
+  }))
 
 # cluster descriptions based on proportion plots
 cluster_descriptions <- tribble(~method, ~cluster, ~description,
@@ -147,7 +147,7 @@ nb_models <- final_df %>%
       tibble(lower = cf[2,1], upper = cf[2,2])
     })) %>% 
   unnest(c(tidied, confint)) %>% 
-  select(-data) %>% 
+  dplyr::select(-data) %>% 
   ungroup()
 
 # plot the estimate and std err per each model
@@ -158,7 +158,7 @@ nb_models %>%
   left_join(cluster_descriptions) %>% 
   mutate(description = factor(description, 
                               levels = c('Day workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
-  select(method, description, estimate, lower, upper) %>% 
+  dplyr::select(method, description, estimate, lower, upper) %>% 
   # pivot_longer(cols = estimate) %>% 
   ggplot(aes(x = estimate, y = method, xmin = lower, xmax = upper, color = description)) +
   geom_point() +
@@ -231,7 +231,7 @@ final_df %>%
   mutate(method = sub(pattern = "*_.*", "", method),
          cluster = as.numeric(sub(pattern = ".+[a-z| ]", '', cluster))) %>% 
   left_join(cluster_descriptions) %>%
-  select(ID, age, sex, state, alone_minutes, year, method, cluster = description) %>% 
+  dplyr::select(ID, age, sex, state, alone_minutes, year, method, cluster = description) %>% 
   group_by(method) %>% 
   group_split() %>% 
   set_names(c("hamming_df", "lcs_df", "lv_df", "osa_df")) %>% 

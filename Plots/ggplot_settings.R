@@ -9,12 +9,12 @@ theme_custom <- function() {
       panel.grid.minor.x = element_line(color = NA),
       panel.grid.major.x = element_line(color = "gray95"),
       panel.background = element_rect(fill = NA),
-      plot.background = element_rect(
-        fill = NA,
-        color = "gray95",
-        size = 10
-      ),
-      plot.margin = unit(c(1, 1, 1, 1), "cm"),
+      # plot.background = element_rect(
+      #   fill = NA,
+      #   color = "gray95",
+      #   size = 10
+      # ),
+      plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
       axis.title = element_text(color = "gray30"),
       axis.ticks = element_line(color = NA),
       strip.background = element_rect(fill = "gray95"),
